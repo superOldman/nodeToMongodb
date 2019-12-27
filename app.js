@@ -10,41 +10,74 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-// view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
-var ejs=require('ejs');
+// 设置 视图为 .html 文件
+var ejs = require('ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.engine('html',ejs.__express);
+app.engine('html', ejs.__express);
 app.set('view engine', 'html');
-
-// 跨域配置
-app.all("*",function(req,res,next){
-  var orginList=[
-      "http://localhost:9000",
-      "http://localhost:4000"
-  ];
-  // if(orginList.includes(req.headers.origin.toLowerCase())){
-  //     //设置允许跨域的域名，*代表允许任意域名跨域
-  //     res.header("Access-Control-Allow-Origin",req.headers.origin);
-  // }
-  res.header("Access-Control-Allow-Origin","*");
-
-  //允许的header类型
-  res.header("Access-Control-Allow-Headers", "content-type");
-  //跨域允许的请求方式
-  res.header("Access-Control-Allow-Methods", "DELETE,PUT,POST,GET,OPTIONS");
-  if (req.method.toLowerCase() == 'options')
-      res.send(200);  //让options尝试请求快速结束
-  else
-      next();
-});
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+/**
+ *  express-session 配置
+ */
+const session = require('express-session');
+app.use(
+  session({
+    secret: 'skmtest',
+    resave: true,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 5 }
+  })
+);
+
+// 跨域配置
+app.all('*', function(req, res, next) {
+  var orginList = ['http://localhost:9000', 'http://localhost:5501','http://127.0.0.1:5501'];
+  if(orginList.includes(req.headers.origin.toLowerCase())){
+      //设置允许跨域的域名，*代表允许任意域名跨域
+      res.header("Access-Control-Allow-Origin",req.headers.origin);
+  }
+  // 允许所有跨域
+  // res.header('Access-Control-Allow-Origin', '*');
+
+  //允许的header类型
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  //客户端携带证书方式（带cookie跨域 必须）
+  res.header('Access-Control-Allow-Credentials', 'true');
+  //跨域允许的请求方式
+  res.header('Access-Control-Allow-Methods', 'DELETE,PUT,POST,GET,OPTIONS');
+  // if (req.method.toLowerCase() == 'options')
+  //     res.send(200);  //让options尝试请求快速结束
+  // else
+  next();
+});
+
+
+
+/**
+ *  session 拦截
+ */
+app.all('*', function(req, res, next) {
+
+  if (req.url !== '/login' && req.url !== '/' && req.url !== '/register' ) {
+    let username = req.session.username;
+    if (username) {
+      next();
+    } else {
+      res.send({
+        code: 1,
+        message: '用户未登陆！'
+      });
+    }
+  }else{
+    next()
+  }
+});
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -64,5 +97,13 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// Passport Config
+// const passport = require('passport');
+// require('./config/passport');
+
+// Passport middleware
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 module.exports = app;

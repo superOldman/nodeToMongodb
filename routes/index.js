@@ -1,12 +1,8 @@
 var express = require('express');
 var router = express.Router();
-let bcrypt = require('bcryptjs');
-
 
 var mongoose = require('mongoose'); //引入对象
-var TodoModel = mongoose.model('list');//引入模型
 
-let UsersFunction = require('../constrillers/usersFunction')
 // 设置用户
 let testSchma = mongoose.Schema({ name:String,email:String,password:String });
 
@@ -17,30 +13,6 @@ testSchma.methods.getName = function (){
 
  let testModel = mongoose.model('test',testSchma);
 
-//  let skm = new testModel({
-//   name:'skmUser',
-//   password:'az6967668'
-// })
-// // console.log(skm.name)
-// // skm.getName()
-
-// skm.save((err,skm)=>{
-//   if(err){
-//     console.error(err)
-//   }
-//   console.log('注册成功！')
-// }) 
-
-// for(let i=0;i<100;i++){
-//   new testModel({ name : 'skm'+i }).save(function(err,data){
-//     console.log('succeed ！')
-//   })
-// }
- 
-
-// testModel.find({'name':/1$/},function(err,data){
-//   console.log(data)
-// })
 
 var URL = require('url'); //引入URL中间件，获取req中的参数需要
 
@@ -82,24 +54,6 @@ var URL = require('url'); //引入URL中间件，获取req中的参数需要
 
 
 
-// //注册
-// router.post('/register',function(req,res,next){
-//   bcrypt.genSalt(10,function(err, salt){
-//     bcrypt.hash(req.body.password,salt,function(err,hash){
-//       let skm = new testModel({
-//         name: req.body.name,
-//         password: hash
-//       }).save(function(err,data){
-//         console.log('-----')
-//         console.log(data)
-//         console.log('-----')
-
-//       })    
-//     })
-//   })
-// })
-
-
 
 
 
@@ -115,53 +69,12 @@ router.get('/', function(req, res, next) {
 // });
 
 
-//登陆接口
-router.post('/login',function(req,res){
-  let username = req.body.username;
-  let password = req.body.password;
-  testModel.findOne({name:username})
-  .exec(function(err, data){    
-    bcrypt.compare( password, data.password, function(err, passwordisTure) {
-      let dataJson = {}
-      if(passwordisTure){
 
-        req.session.username = username;
 
-        dataJson.code = 0;
-        dataJson.message = '登陆成功';
-      }else{
-        dataJson.code = 1;
-        dataJson.message = '登陆失败';
-      }
-      res.send(dataJson)
-
-    });
-  })
-});
-
-// router.post('/signup', function(req,res,next){
-//   // console.log('zou')
-
-// });
-router.post('/register',function(req,res,next){
-  bcrypt.genSalt(10,function(err, salt){
-    bcrypt.hash(req.body.password,salt,function(err,hash){
-      let skm = new testModel({
-        name: req.body.username,
-        email: req.body.email,
-        password: hash
-      }).save(function(err,data){
-        console.log('-----')
-        console.log(data)
-        console.log('-----')
-        res.send('注册成功')
-
-      })    
-    })
-  })
-})
-
+// 判断登陆
 router.get('/islogin',function(req,res,next){
+
+  console.log('/islogin   总router' )
    if(!req.session.username){
       res.send({
         code: 1,
@@ -170,37 +83,60 @@ router.get('/islogin',function(req,res,next){
    }else{
     res.send({
       code: 0,
-      message: '已经登陆！'
+      message: '已经登陆！',
+      username: req.session.username
     })
    }
 })
 
 
+// user对象
+let htmlModel = require('../htmlModel');
 
-// //定义接口
-// router.post('/create', function(req, res) {
-//   new TodoModel({ //实例化对象，新建数据
-//       title: req.body.title, //定义一个属性title，类型为String
-//       content: req.body.content, //定义一个属性content，类型为String
-//       updated_at: Date.now()
-//   }).save(function(err, todo, count) { //保存数据
-//       console.log('内容', todo, '数量', count); //打印保存的数据
-//       res.redirect('/'); //返回首页
-//   });
-// });
-
-
-router.get('/search', function(req, res, next) {
-
-  console.log('search接口',req.session)
-  testModel.
-  find().
-  // sort('updated_at').
+ //定义接口
+router.post('/saveHtml', function(req, res) {
+  htmlModel.instert({ 
+      title: req.body.title, 
+      info: req.body.info,
+      content: req.body.content,
+      author: req.body.author,
+      updated_at: Date.now()
+  }).then(function(data) { //保存数据
+      res.send({
+        code: 1,
+        message:'保存成功'
+      })
+  });
+});
+router.get('/list', function(req, res, next) {
+  htmlModel.
+  find({ author: req.query.author }).
+  sort('updated_at').
   exec(function(err, aa, count) {
     res.send(aa);
   });
 });
 
+
+
+// router.get('/search', function(req, res, next) {
+//   console.log('search接口',req.session)
+//   testModel.
+//   find().
+//   // sort('updated_at').
+//   exec(function(err, aa, count) {
+//     res.send(aa);
+//   });
+// });
+
+router.get('/searchById', function(req, res, next) {
+  htmlModel.
+  findOne({ _id: req.query.id}).
+  // sort('updated_at').
+  exec(function(err, aa, count) {
+    res.send(aa);
+  });
+});
 // //删除
 // router.get('/destroy',function(req,res){
 //   var params=URL.parse(req.url,true).query;

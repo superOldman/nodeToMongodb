@@ -31,7 +31,7 @@ app.use(
     secret: 'skmtest',
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 5 }
+    cookie: { maxAge: 1000 * 60 * 60 }
   })
 );
 
@@ -64,7 +64,11 @@ app.all('*', function(req, res, next) {
  */
 app.all('*', function(req, res, next) {
 
-  if (req.url !== '/login' && req.url !== '/' && req.url !== '/register' ) {
+
+  if (  req.url !== '/' || req.url.includes ('/list')) {
+    next()
+  }else{
+    // req.url.includes ('/users') ||
     let username = req.session.username;
     if (username) {
       next();
@@ -74,8 +78,6 @@ app.all('*', function(req, res, next) {
         message: '用户未登陆！'
       });
     }
-  }else{
-    next()
   }
 });
 

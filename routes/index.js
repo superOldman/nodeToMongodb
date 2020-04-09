@@ -1,56 +1,9 @@
 var express = require('express');
 var router = express.Router();
-
-var mongoose = require('mongoose'); //引入对象
-
-// 设置用户
-let testSchma = mongoose.Schema({
-  name: String,
-  email: String,
-  password: String
-});
-
-testSchma.methods.getName = function() {
-  let myname = this.name ? 'my name is ' + this.name : 'i do not have name';
-  console.log(myname);
-};
-
-let testModel = mongoose.model('test', testSchma);
-
 var URL = require('url'); //引入URL中间件，获取req中的参数需要
+// html对象
+let htmlModel = require('../models/htmlModel');
 
-// https://www.npmjs.com/package/bcryptjs
-// var salt = bcrypt.genSaltSync(10);
-// var hash = bcrypt.hashSync("az6967668", salt);
-
-/**
- * hash生成
- * @param   {Number}  password  密码
- *
- * salt 解析头
- * hash 组成的hash密码
- *
- * let password = 'az6967668'
- * bcrypt.genSalt(10, (err, salt) => {
- *   bcrypt.hash(password, salt, (err, hash) => {
- *      console.log(hash)
- *   })
- * })
- */
-
-/**
- * 密码hash对比
- * @param   {Number}  password  密码
- * @param   {Number}  myhash  库里面的hash密码
- *
- * res 返回值 ture/false
- *
- * let myhash = '$2a$10$O7ZSDdJP2gyHeUm2OVhRJudHq9aDsvwfUkha1tc79VL7SYmw.qkz6'
- * bcrypt.compare( password, myhash, function(err, res) {
- *    console.log(res)
- * });
- *
- */
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -58,11 +11,11 @@ router.get('/', function(req, res, next) {
 });
 
 
+
 // 判断登陆
 router.get('/islogin', function(req, res, next) {
-  console.log('/islogin   总router');
   if (!req.session.username) {
-    res.send({
+    res.status(403).send({
       code: 1,
       message: '请登录！'
     });
@@ -70,78 +23,32 @@ router.get('/islogin', function(req, res, next) {
     res.send({
       code: 0,
       message: '已经登陆！',
-      username: req.session.username
+      username: req.session.username,
+      userMessage:{
+        title:'管理员',
+        userName:req.session.username,
+        imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+      }
     });
   }
 });
 
-// user对象
-let htmlModel = require('../htmlModel');
 
-//定义接口
-router.post('/saveHtml', function(req, res) {
-  htmlModel
-    .instert({
-      title: req.body.title,
-      info: req.body.info,
-      content: req.body.content,
-      author: req.body.author,
-      updated_at: Date.now()
-    })
-    .then(function(data) {
-      //保存数据
-      res.send({
-        code: 1,
-        message: '保存成功'
-      });
-    });
-});
+// 查寻列表
 router.get('/list', function(req, res, next) {
+  let findData = {}
+  if(req.query.author){
+    findData = { author: req.query.author }
+  }
   htmlModel
-    .find({ author: req.query.author })
+    .find(findData)
     .sort('updated_at')
     .exec(function(err, aa, count) {
       res.send(aa);
     });
 });
 
-// 文件上传
-var multiparty = require('multiparty');
 
-// router.post('/uploadImg', function(req, res) {
-//   var form = new multiparty.Form();
-//   form.uploadDir = './public/images'; //这里可以设置图片上传的路径，默认为当前用户下的temp文件夹
-//   form.parse(req, function(err, fields, files) {
-//     //files即为上传图片的信息
-//     if (err) {
-//       console.log('err', err);
-//     }
-//     if (files) {
-//       res.send({
-//         code: 0,
-//         message: '成功',
-//         ...files
-//       });
-//     }
-//   });
-// });
-router.post('/uploadImg', function(req, res) {
-  var form = new multiparty.Form();
-  form.uploadDir = './public/images'; //这里可以设置图片上传的路径，默认为当前用户下的temp文件夹
-  form.parse(req, function(err, fields, files) {
-    //files即为上传图片的信息
-    if (err) {
-      console.log('err', err);
-    }
-    if (files) {
-      res.send({
-        success: 1, // 0 表示上传失败，1 表示上传成功
-        message: '上传成功。',
-        ...files // 文件信息
-      });
-    }
-  });
-});
 // router.get('/search', function(req, res, next) {
 //   console.log('search接口',req.session)
 //   testModel.
@@ -152,36 +59,26 @@ router.post('/uploadImg', function(req, res) {
 //   });
 // });
 
+// 按照id查找文章
 router.get('/searchById', function(req, res, next) {
   htmlModel
     .findOne({ _id: req.query.id })
     // sort('updated_at').
-    .exec(function(err, aa, count) {
-      res.send(aa);
+    .exec(function(err, data, count) {
+      if(err){
+        console.log(err)
+      }else{
+        res.send({
+          code: 0,
+          list: data
+        })
+      }
     });
 });
-// //删除
-// router.get('/destroy',function(req,res){
-//   var params=URL.parse(req.url,true).query;
-//   console.log(params);
-//     //根据待办事项的id 来删除它
-//     TodoModel.findById(params.id, function(err, todo) {
-//       todo.remove(function(err, todo) {
-//           res.redirect('/');
-//       });
-//   });
-// });
 
-// //修改
-// router.get('/edit',function(req,res){
-//   var params=URL.parse(req.url,true).query;
-//   //res.send(params);
-//   TodoModel.findById(params.id,function(err,todo){
-//    // res.redirect('edit'); //返回首页
-//     res.send(todo);
 
-//   })
-// });
+
+
 
 // //更新
 // router.post('/update',function(req,res){

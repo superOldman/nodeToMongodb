@@ -1,6 +1,6 @@
-const db = require('./db.js');
+const db = require('../db.js');
 const mongoose = require('mongoose'); //引入对象
-
+// 文章列表对象
 class HtmlModel {
   constructor() {
     var htmlSchema = new mongoose.Schema({
@@ -16,6 +16,10 @@ class HtmlModel {
         type: String,
         required: true
       },
+      markdown: {
+        type: String,
+        required: true
+      },
       author: {
         type: String,
         required: true
@@ -28,7 +32,7 @@ class HtmlModel {
 
     this.htmlModel = db.model('paperList', htmlSchema); //将该Schema发布为Model,userList就是集合名称
   }
-  // 注册用户
+  // 填加文章
   instert(data) {
     let html = this.htmlModel(data);
     return html.save();
@@ -41,7 +45,13 @@ class HtmlModel {
   find(data) {
     return this.htmlModel.find(data);
   }
-
+  // data : {"email":"QQQQ@qq.com"}
+  deleteOne(data,callback){
+    return this.htmlModel.deleteOne(data, callback)
+  }
+  findByIdAndUpdate(id,doc,options,callback){
+    return this.htmlModel.findByIdAndUpdate(id,doc)
+  }
   async singup(req, res, next) {
     res.header('Access-Control-Allow-Headers');
 

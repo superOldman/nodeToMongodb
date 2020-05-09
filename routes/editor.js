@@ -78,19 +78,19 @@ router.get('/destroy', function(req, res) {
   // console.log(URL.parse(req.url, true)); // 废弃
   // var params = new URL(req.url);
 
-  console.log(req.query.id);
+  console.log('id',req.query.id);
   // 根据待办事项的id 来删除它
   htmlModel.deleteOne({ _id: req.query.id}, function (err, doc) {
     if(err)
     {
-        console.log(err)
+        console.log('err',err)
         return
     }
     // console.log(doc) // { n: 1, ok: 1, deletedCount: 1 }
     htmlModel.find().exec(function(err,data){
       if(err)
       {
-          console.log(err)
+          console.log('err',err)
           return
       }
       res.send({code: 0,article: data})

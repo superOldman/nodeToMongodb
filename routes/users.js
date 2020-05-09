@@ -35,7 +35,7 @@ router.post('/login',function(req,res){
         dataJson.code = 1;
         dataJson.message = '登录失败';
       }
-      res.send(dataJson)
+      res.send(dataJson);
 
     });
   })
@@ -60,16 +60,16 @@ router.post('/register',function(req,res,next){
       })    
     })
   })
-})
+});
 
 // 推出登录
 router.get('/logout',function(req,res){
   req.session.username = null;
-  res.send({
-    code: 0,
-    message: '退出登录'
-  })
-})
+  res.status(401).send({
+    code: 1,
+    message: '请重新登录！'
+  });
+});
 
 module.exports = router;
 

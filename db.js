@@ -1,7 +1,6 @@
 // https://cn.mongoosedoc.top/docs/index.html
 var mongoose = require('mongoose'); //引入mongoose
 
-
 /**
  * 数据库账号、密码
  */
@@ -43,8 +42,11 @@ if(process.env.NODE_ENV === 'production'){
  * 默认port为27017
  */
 
-mongoose.connect('mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + ':' + port + '/' + database); // 开发数据库
+mongoose.connect('mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + ':' + port + '/' + database); // 连接数据库
+// mongoose.connect('mongodb://'+ ip + ':' + port + '/' + database); // 连接数据库
 
+
+console.log('连接数据库：' + 'mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + ':' + port + '/' + database)
 var db = mongoose.connection;
 db.on('error', function callback() {
   //监听是否有异常

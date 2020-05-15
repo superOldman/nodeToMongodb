@@ -24,9 +24,23 @@ class HtmlModel {
         type: String,
         required: true
       },
+      saveImageUrl: {
+        type: String,
+        required: false
+      },
+      hasTags: {
+        type: Array,
+        required: true
+      },
+      hasFolder: {
+        type: String,
+        required: true
+      },
+
+
       updated_at: {
         type: Date,
-        default: Date.now
+        default: new Date()
       }
     });
 

@@ -12,6 +12,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var editorRouter = require('./routes/editor');
+var searchRouter = require('./routes/search');
+var topRouter = require('./routes/top');
 
 //实例化
 var app = express();
@@ -94,6 +96,7 @@ app.all('*', function(req, res, next) {
  */
 app.all('*', function(req, res, next) {
   if (req.url.includes('/users/logout') || req.url.includes('/editor')) {
+    req.session.username = 'superOldMan';
     let username = req.session.username;
 
     console.log('拦截登录：',username)
@@ -116,6 +119,10 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 // 后台编辑器接口
 app.use('/editor', editorRouter);
+
+
+app.use('/search', searchRouter);
+app.use('/top', topRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

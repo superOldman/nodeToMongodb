@@ -89,7 +89,7 @@ router.post('/saveEditorHtml', function(req, res){
 //   });
 // });
 
-// 上传图片 利用：formidable 保存图片格式还不对
+// 上传图片 利用：formidable 保存图片格式还不对 
 router.post('/uploadImg', function (req, res) {
   const form = formidable({ 
     multiples: true,
@@ -136,14 +136,6 @@ router.get('/destroy', function(req, res) {
   })
 });
 
-//修改
-// router.get('/edit', function(req, res) {
-//   var params = URL.parse(req.url, true).query;
-//   //res.send(params);
-//   TodoModel.findById(params.id, function(err, todo) {
-//     // res.redirect('edit'); //返回首页
-//     res.send(todo);
-//   });
-// });
+
 
 module.exports = router;

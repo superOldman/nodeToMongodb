@@ -63,7 +63,7 @@ router.post('/saveEditorHtml', function(req, res){
 })
 
 
-// 上传图片
+// 上传图片 利用：multiparty
 // router.post('/uploadImg', function (req, res) {
 //   var form = new multiparty.Form({ encoding: "utf-8" });
 //   console.log(form)
@@ -88,6 +88,8 @@ router.post('/saveEditorHtml', function(req, res){
 //     }
 //   });
 // });
+
+// 上传图片 利用：formidable 保存图片格式还不对
 router.post('/uploadImg', function (req, res) {
   const form = formidable({ 
     multiples: true,

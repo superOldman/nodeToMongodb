@@ -34,9 +34,12 @@ class HtmlModel {
       },
       hasFolder: {
         type: String,
-        required: true
+        default: ''
       },
-
+      stick: {
+        type: Boolean,
+        default: false
+      },
 
       updated_at: {
         type: Date,
@@ -45,6 +48,9 @@ class HtmlModel {
     });
 
     this.htmlModel = db.model('paperList', htmlSchema); //将该Schema发布为Model,userList就是集合名称
+  }
+  schema() {
+    return this.htmlModel
   }
   // 填加文章
   instert(data) {
@@ -56,8 +62,8 @@ class HtmlModel {
     return this.htmlModel.findOne(data);
   }
   // 查找
-  find(data) {
-    return this.htmlModel.find(data);
+  find(data, projection, options) {
+    return this.htmlModel.find(data, projection, options);
   }
   // data : {"email":"QQQQ@qq.com"}
   deleteOne(data,callback){
@@ -66,11 +72,7 @@ class HtmlModel {
   findByIdAndUpdate(id,doc,options,callback){
     return this.htmlModel.findByIdAndUpdate(id,doc)
   }
-  async singup(req, res, next) {
-    res.header('Access-Control-Allow-Headers');
 
-    res.set('Content-Type');
-  }
 }
 
 module.exports = new HtmlModel();

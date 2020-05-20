@@ -24,6 +24,7 @@ class UserModel {
 
     this.userModel = db.model('userList', userSchema); //将该Schema发布为Model,userList就是集合名称
   }
+
   // 注册用户
   instert(data) {
     console.log(data);
@@ -43,5 +44,8 @@ class UserModel {
     res.set('Content-Type');
   }
 }
+
+
+
 
 module.exports = new UserModel();

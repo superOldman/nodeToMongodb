@@ -1,70 +1,56 @@
 const db = require('../db.js');
 const mongoose = require('mongoose'); //引入对象
-// 文章列表对象
+// 置顶列表对象
 class TopModel {
   constructor() {
-    // title: data.title,
-    //   showPaperId: data._id,
-    //     createDate: data.updated_at,
-    //       upDate: data.updated_at,
-    //         image: data.saveImageUrl,
-    //           show: true
+
     var topSchema = new mongoose.Schema({
-      topList: {
-        type: Array,
+      cover: {
+        type: String,
+        required: false
+      },
+      title: {
+        type: String,
         required: true
       },
-      // title: {
-      //   type: String,
-      //   required: true
-      // },
-      // showPaperId: {
-      //   type: String,
-      //   required: true
-      // },
-      // createDate: {
-      //   type: String,
-      //   required: true
-      // },
-      // upDate: {
-      //   type: String,
-      //   required: true
-      // },
-      // image: {
-      //   type: String,
-      //   required: true
-      // },
-      // show: {
-      //   type: String,
-      //   required: true
-      // }
+      info: {
+        type: String,
+        required: true
+      },
+      updated_at: {
+        type: Date,
+        default: new Date()
+      }
     });
 
     this.topModel = db.model('topList', topSchema); //将该Schema发布为Model,userList就是集合名称
   }
   // 填加
   instert(data) {
-    let topModel = this.topModel(data);
-    return topModel.save();
+    return this.topModel(data).save();
   }
   // 查找
   findOne(data) {
     return this.topModel.findOne(data);
   }
   // 查找
-  find() {
-    console.log('zou')
-    return this.topModel.find();
+  find(findData, projection, options) {
+    return this.topModel.find(findData, projection, options);
   }
-  // data : {"email":"QQQQ@qq.com"}
   deleteOne(data, callback) {
     return this.topModel.deleteOne(data, callback)
   }
   delete() {
     return this.topModel.delete()
+  } 
+  findOneAndUpdate(conditions, doc, options, callback) {
+    return this.topModel.findOneAndUpdate(conditions, doc, options)
   }
-  findByIdAndUpdate(id,doc,options,callback){
-    return this.topModel.findByIdAndUpdate(id,doc)
+  findByIdAndUpdate(id, doc, options, callback) {
+    return this.topModel.findByIdAndUpdate(id, doc, options)
+  }
+  findByIdAndDelete(id, callback) {
+    return this.topModel.findByIdAndDelete(id, callback)
   }
 
 }

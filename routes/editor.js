@@ -8,29 +8,38 @@ var beforeIp = process.env.NODE_ENV === 'production' ? 'http://47.96.2.170:3000/
 var URL = require('url'); //引入URL中间件，获取req中的参数需要
 // html对象
 let htmlModel = require('../models/htmlModel');
+let folderModel = require('../models/folderModel');
 
 
 /* GET editor listing. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
 //定义接口
-router.post('/saveHtml', function(req, res) {
+router.post('/saveHtml', function (req, res) {
 
   // console.log(req.body)
-  
+
   htmlModel.instert({
-      title: req.body.title,
-      info: req.body.info,
-      content: req.body.content,
-      markdown: req.body.markdown,
-      author: req.body.author,
-      saveImageUrl: beforeIp + req.body.saveImageUrl,
-      hasTags: req.body.hasTags,
-      hasFolder: req.body.hasFolder
-    })
-    .then(function(data) {
+    title: req.body.title,
+    info: req.body.info,
+    content: req.body.content,
+    markdown: req.body.markdown,
+    author: req.body.author,
+    saveImageUrl: req.body.saveImageUrl.startsWith('http') ? req.body.saveImageUrl : beforeIp + req.body.saveImageUrl,
+    hasTags: req.body.hasTags,
+    hasFolder: req.body.hasFolder
+  })
+    .then(function (data) {
+
+      if (data.hasFolder) {
+        //* folderHasPaper：[{
+        //*    _id: 文章id,
+        //*    title: 文章标题
+        //*  }]
+        folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then()
+      }
       //保存数据
       res.send({
         code: 1,
@@ -39,14 +48,14 @@ router.post('/saveHtml', function(req, res) {
     });
 });
 
-router.post('/saveEditorHtml', function(req, res){
+router.post('/saveEditorHtml', function (req, res) {
   let seachId = '';
   let editDoc = {};
-  for(let item in req.body){
+  for (let item in req.body) {
     console.log(item)
-    if(item === '_id'){
+    if (item === '_id') {
       seachId = req.body[item]
-    }else{
+    } else {
       editDoc[item] = req.body[item];
     }
   }
@@ -54,12 +63,12 @@ router.post('/saveEditorHtml', function(req, res){
   console.log('id:' + seachId)
   console.log('editDoc:' + editDoc)
   htmlModel
-  .findByIdAndUpdate(seachId, editDoc).then(function(data){
-    res.send({
-      code: 1,
-      message: '修改成功'
+    .findByIdAndUpdate(seachId, editDoc).then(function (data) {
+      res.send({
+        code: 1,
+        message: '修改成功'
+      })
     })
-  })
 })
 
 
@@ -91,10 +100,11 @@ router.post('/saveEditorHtml', function(req, res){
 
 // 上传图片 利用：formidable 保存图片格式还不对 
 router.post('/uploadImg', function (req, res) {
-  const form = formidable({ 
+  const form = formidable({
     multiples: true,
-    uploadDir: './public/images'
-   });
+    keepExtensions: true,
+    uploadDir: './public/images',
+  });
 
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -111,31 +121,30 @@ router.post('/uploadImg', function (req, res) {
 });
 
 //删除
-router.get('/destroy', function(req, res) {
+router.get('/destroy', function (req, res) {
   // console.log(URL.parse(req.url, true)); // 废弃
   // var params = new URL(req.url);
 
-  console.log('id',req.query.id);
+  console.log('id', req.query.id);
   // 根据待办事项的id 来删除它
-  htmlModel.deleteOne({ _id: req.query.id}, function (err, doc) {
-    if(err)
-    {
-        console.log('err',err)
-        return
+  htmlModel.deleteOne({ _id: req.query.id }, function (err, doc) {
+    if (err) {
+      console.log('err', err)
+      return
     }
     // console.log(doc) // { n: 1, ok: 1, deletedCount: 1 }
-    htmlModel.find().exec(function(err,data){
-      if(err)
-      {
-          console.log('err',err)
-          return
+    htmlModel.find().exec(function (err, data) {
+      if (err) {
+        console.log('err', err)
+        return
       }
-      res.send({code: 0,article: data})
+      res.send({ code: 0, article: data })
     })
-    
+
   })
 });
 
 
 
 module.exports = router;
+

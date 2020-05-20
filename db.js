@@ -47,7 +47,12 @@ mongoose.connect('mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + '
 
 
 console.log('连接数据库：' + 'mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + ':' + port + '/' + database)
+
+
 var db = mongoose.connection;
+
+// console.log(db.collection())
+
 db.on('error', function callback() {
   //监听是否有异常
   console.log('Connection error');

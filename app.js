@@ -13,7 +13,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var editorRouter = require('./routes/editor');
 var searchRouter = require('./routes/search');
-var topRouter = require('./routes/top');
+var folderRouter = require('./routes/folder');
 
 //实例化
 var app = express();
@@ -70,6 +70,10 @@ app.all('*', function(req, res, next) {
     'http://127.0.0.1:5503',
     'http://47.96.2.170:80'
   ];
+
+
+  console.log('拦截跨域')
+  console.log(req.headers.origin)
   if (orginList.includes(req.headers.origin.toLowerCase())) {
     //设置允许跨域的域名，*代表允许任意域名跨域
     res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -94,24 +98,24 @@ app.all('*', function(req, res, next) {
 /**
  *  session 拦截
  */
-app.all('*', function(req, res, next) {
-  if (req.url.includes('/users/logout') || req.url.includes('/editor')) {
-    req.session.username = 'superOldMan';
-    let username = req.session.username;
+// app.all('*', function(req, res, next) {
+//   if (req.url.includes('/users/logout') || req.url.includes('/editor')) {
+//     req.session.username = 'superOldMan';
+//     let username = req.session.username;
 
-    console.log('拦截登录：',username)
-    if (username) {
-      next();
-    } else {
-      res.send({
-        code: 1,
-        message: '用户未登陆！'
-      });
-    }
-  } else {
-    next();
-  }
-});
+//     console.log('拦截登录：',username)
+//     if (username) {
+//       next();
+//     } else {
+//       res.send({
+//         code: 1,
+//         message: '用户未登陆！'
+//       });
+//     }
+//   } else {
+//     next();
+//   }
+// });
 
 // 通用接口
 app.use('/', indexRouter);
@@ -122,7 +126,7 @@ app.use('/editor', editorRouter);
 
 
 app.use('/search', searchRouter);
-app.use('/top', topRouter);
+app.use('/folder', folderRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

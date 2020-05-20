@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let arr = [{
+            "_id": {
+                "$oid": "5ebe87e44064e7cc2ce86e22"
+            },
+            "hasTags": [
+                "的味道",
+                "的味道",
+                "的味道",
+                "的味道",
+                "111"
+            ],
+            "updated_at": {
+                "$date": "2020-05-15T12:11:06.230Z"
+            },
+            "title": "大沙发斯蒂芬",
+            "info": "简介...",
+            "content": "<h6",
+            "markdown": "sdfsaf",
+            "author": "superOldman",
+            "saveImageUrl": "http://localhost:3000/public\\images\\upload_39c9c08aae073eec28b8b8f765dd4113",
+            "hasFolder": "jsj1",
+            "__v": 0
+        }, {
+            "_id": {
+                "$oid": "5ec20a76725b2911081abd42"
+            },
+            "hasTags": [
+                "的味道",
+                "的味道",
+                "的味道",
+                "的味道",
+                "111"
+            ],
+            "updated_at": {
+                "$date": "2020-05-15T12:11:06.230Z"
+            },
+            "title": "大沙发斯蒂芬",
+            "info": "简介...",
+            "content": "<h6 id=\"h6-n",
+            "markdown": "sdfsaf",
+            "author": "superOldman",
+            "saveImageUrl": "http://localhost:3000/public\\images\\upload_39c9c08aae073eec28b8b8f765dd4113",
+            "hasFolder": "jsj1",
+            "__v": 0
+        }]
+
+        // let result = arr.filter((item)=>{
+
+        //     console.log(Object.keys(item))
+
+        //     return true 
+        // })
+
+        // let newArr = []
+        // arr.forEach((item)=>{
+
+        //     delete item.age
+        //     delete item.markdown
+
+        // })
+        // console.log(arr)
+
+
+
+        let dealDoc = []
+        arr.forEach((item) => {
+            let obj = {};
+            // Object.keys(item).forEach((keys)=>{
+            for (let key in item) {
+                if (key === 'content' || key === 'markdown') {
+                    continue
+                }
+                obj[key] = item[key]
+            }
+            // })
+            dealDoc.push(obj)
+        })
+        console.log(dealDoc)
+
+    </script>
+</body>
+
+</html>

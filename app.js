@@ -98,24 +98,24 @@ app.all('*', function(req, res, next) {
 /**
  *  session 拦截
  */
-// app.all('*', function(req, res, next) {
-//   if (req.url.includes('/users/logout') || req.url.includes('/editor')) {
-//     req.session.username = 'superOldMan';
-//     let username = req.session.username;
+app.all('*', function(req, res, next) {
+  if (req.url.includes('/users/logout') || req.url.includes('/editor')) {
+    req.session.username = 'superOldMan';
+    let username = req.session.username;
 
-//     console.log('拦截登录：',username)
-//     if (username) {
-//       next();
-//     } else {
-//       res.send({
-//         code: 1,
-//         message: '用户未登陆！'
-//       });
-//     }
-//   } else {
-//     next();
-//   }
-// });
+    console.log('拦截登录：',username)
+    if (username) {
+      next();
+    } else {
+      res.send({
+        code: 1,
+        message: '用户未登陆！'
+      });
+    }
+  } else {
+    next();
+  }
+});
 
 // 通用接口
 app.use('/', indexRouter);

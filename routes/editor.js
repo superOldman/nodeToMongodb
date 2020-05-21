@@ -9,6 +9,7 @@ var URL = require('url'); //引入URL中间件，获取req中的参数需要
 // html对象
 let htmlModel = require('../models/htmlModel');
 let folderModel = require('../models/folderModel');
+let tagModel = require('../models/tagModel');
 
 
 /* GET editor listing. */
@@ -40,12 +41,22 @@ router.post('/saveHtml', function (req, res) {
         //*  }]
         folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then()
       }
+
+      if (data.hasTags.length){
+        // var insertArr = [];
+        data.hasTags.forEach((item)=>{
+          // insertArr.push({ name: item })
+          tagModel.update({name: item}, {name: item}, {upsert: true}).then()
+        })
+        
+      } 
+    }).then(()=>{
       //保存数据
       res.send({
         code: 1,
         message: '保存成功'
       });
-    });
+    })
 });
 
 router.post('/saveEditorHtml', function (req, res) {

@@ -19,7 +19,7 @@ var database = 'editor';
 /**
  * 在线环境 使用变量
  */
-var ip_ol = '47.96.2.170'; 
+var ip_ol = '47.96.2.170';
 var port_ol = '27017';
 var database_ol = 'blogEditor'; // 在线使用该库名
 
@@ -30,8 +30,8 @@ var database_ol = 'blogEditor'; // 在线使用该库名
  *  const baseAddress = process.env.NODE_ENV === 'production' ? 'http://47.96.2.170:3000': 'http://127.0.0.1:3000';
  */
 
- console.log('process.env.NODE_ENV',process.env.NODE_ENV)
-if(process.env.NODE_ENV === 'production'){
+console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+if (process.env.NODE_ENV === 'production') {
   ip = ip_ol
   port = port_ol
   database = database_ol

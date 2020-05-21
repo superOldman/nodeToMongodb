@@ -22,14 +22,14 @@ class TagModel {
     return this.tagModel(data).save();
   }
   // 批量填加
-//   var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
-// Movies.insertMany(arr, function (error, docs) { });
-  insertMany(arr,options) {
-    return this.tagModel.insertMany(arr,options);
+  //   var arr = [{ name: 'Star Wars' }, { name: 'The Empire Strikes Back' }];
+  // Movies.insertMany(arr, function (error, docs) { });
+  insertMany(arr, options) {
+    return this.tagModel.insertMany(arr, options);
   }
 
 
-  
+
   // 查找
   findOne(data) {
     return this.tagModel.findOne(data);
@@ -49,13 +49,13 @@ class TagModel {
   updateMany(data, options) {
     return this.tagModel.updateMany(data, options)
   }
-  
+
   deleteOne(data, callback) {
     return this.tagModel.deleteOne(data, callback)
   }
   delete() {
     return this.tagModel.delete()
-  } 
+  }
   findOneAndUpdate(conditions, doc, options, callback) {
     return this.tagModel.findOneAndUpdate(conditions, doc, options)
   }

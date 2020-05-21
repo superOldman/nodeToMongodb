@@ -31,7 +31,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 设置图片返回路径
-app.get('/public/images/*', function(req, res) {
+app.get('/public/images/*', function (req, res) {
   res.sendFile(__dirname + '/' + req.url);
   console.log('Request for ' + req.url + ' received.');
 });
@@ -54,7 +54,7 @@ app.use(
 );
 
 // 跨域配置
-app.all('*', function(req, res, next) {
+app.all('*', function (req, res, next) {
   var orginList = [
     'http://www.sicilymarmot.top',
     'http://www.sicilymarmot.top:80',
@@ -98,12 +98,12 @@ app.all('*', function(req, res, next) {
 /**
  *  session 拦截
  */
-app.all('*', function(req, res, next) {
+app.all('*', function (req, res, next) {
   if (req.url.includes('/users/logout') || req.url.includes('/editor')) {
     req.session.username = 'superOldMan';
     let username = req.session.username;
 
-    console.log('拦截登录：',username)
+    console.log('拦截登录：', username)
     if (username) {
       next();
     } else {
@@ -129,12 +129,12 @@ app.use('/search', searchRouter);
 app.use('/folder', folderRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

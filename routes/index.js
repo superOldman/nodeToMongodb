@@ -9,7 +9,7 @@ let topModel = require('../models/topModel');
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
 
   console.log('空')
   res.render('index', { title: 'Express' });
@@ -18,7 +18,7 @@ router.get('/', function(req, res, next) {
 
 
 // 判断登陆
-router.get('/islogin', function(req, res, next) {
+router.get('/islogin', function (req, res, next) {
   if (!req.session.username) {
     res.status(403).send({
       code: 1,
@@ -29,10 +29,10 @@ router.get('/islogin', function(req, res, next) {
       code: 0,
       message: '已经登陆！',
       username: req.session.username,
-      userMessage:{
-        title:'管理员',
-        userName:req.session.username,
-        imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+      userMessage: {
+        title: '管理员',
+        userName: req.session.username,
+        imgUrl: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
       }
     });
   }
@@ -52,29 +52,28 @@ router.get('/list', function (req, res, next) {
     findData.hasFolder = '';
   }
 
-  if(req.query.page && req.query.pageSize){
+  if (req.query.page && req.query.pageSize) {
     // .limit(pageSize) 限制数量
     // .skip(Count) 跳过几个
     options.limit = req.query.pageSize * 1;
     options.skip = (req.query.page - 1) * req.query.pageSize;
-    Promise.all([ 
-      htmlModel.schema().collection.stats(), 
+    Promise.all([
+      htmlModel.schema().collection.stats(),
       htmlModel.find(findData, projection, options),
     ]).then(data => {
-        res.send({
-          code: 0,
-          data: {
-            list: data[1],
-            sum: data[0].count
-          }
-        });
-      })
-  }else{
+      res.send({
+        code: 0,
+        data: {
+          list: data[1],
+          sum: data[0].count
+        }
+      });
+    })
+  } else {
     htmlModel
       .find(findData, projection, options)
       .exec(function (err, doc, count) {
 
-        console.log(doc)
         res.send({
           code: 0,
           data: doc
@@ -82,8 +81,8 @@ router.get('/list', function (req, res, next) {
       });
   }
 
-  
- 
+
+
 
 });
 
@@ -93,15 +92,15 @@ router.get('/folderOrTagList', function (req, res, next) {
 
   // { participant: { $elemMatch: { $eq: 1 } } }
   let findData;
-  if(req.query.hasTags){
+  if (req.query.hasTags) {
     findData = { hasTags: { $elemMatch: { $eq: req.query.hasTags } } }
-  }else{
+  } else {
     findData = req.query;
   }
 
   let projection = { markdown: 0, content: 0 }
   let options = { sort: { updated_at: -1 } }
-  
+
   htmlModel.find(findData, projection, options)
     .exec(function (err, doc, count) {
       res.send({
@@ -114,7 +113,7 @@ router.get('/folderOrTagList', function (req, res, next) {
 
 //置顶列表
 router.get('/topList', function (req, res, next) {
-  topModel.find({},null,{ limit: 2}).exec(function(err,doc){
+  topModel.find({}, null, { limit: 2 }).exec(function (err, doc) {
     res.send({
       code: 0,
       data: doc
@@ -124,17 +123,16 @@ router.get('/topList', function (req, res, next) {
 
 // 文件夹和标签列表
 router.get('/folderAndTagList', function (req, res, next) {
-// , tagModel.find(), 
-// , folderModel.find()
-  Promise.all([folderModel.find({}, null, { lean: true }), tagModel.find({}, null, { lean: true })]).then((data)=>{
-    console.log(data)
-      res.send({
-        code: 0,
-        data: { 
-          folderList: data[0],
-          tagList: data[1],
-        }
-      })
+  // , tagModel.find(), 
+  // , folderModel.find()
+  Promise.all([folderModel.find({}, null, { lean: true }), tagModel.find({}, null, { lean: true })]).then((data) => {
+    res.send({
+      code: 0,
+      data: {
+        folderList: data[0],
+        tagList: data[1],
+      }
+    })
   })
   // topModel.find({}, null, { limit: 2 }).exec(function (err, doc) {
   //   res.send({
@@ -154,12 +152,12 @@ router.get('/folderAndTagList', function (req, res, next) {
 // });
 
 // 按照id查找文章
-router.get('/searchById', function(req, res, next) {
+router.get('/searchById', function (req, res, next) {
   htmlModel.findOne({ _id: req.query.id })
-    .exec(function(err, data, count) {
-      if(err){
+    .exec(function (err, data, count) {
+      if (err) {
         console.log(err)
-      }else{
+      } else {
         res.send({
           code: 0,
           list: data

@@ -42,7 +42,7 @@ class TopModel {
   }
   delete() {
     return this.topModel.delete()
-  } 
+  }
   findOneAndUpdate(conditions, doc, options, callback) {
     return this.topModel.findOneAndUpdate(conditions, doc, options)
   }

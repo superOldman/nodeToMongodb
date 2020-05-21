@@ -88,6 +88,38 @@
         })
         console.log(dealDoc)
 
+
+        function fn(params) {
+            return new Promise((result,reject)=>{
+                setTimeout(()=>{
+                    result(params)
+                },1000)
+            })
+        }
+
+
+        async function test() {
+            let con1 = await fn('hi');
+            console.log(con1)
+            let con2 = await fn(11111111111111);
+            console.log(con2)
+            console.log('dsfasdfasfasfafs')
+        }
+
+        test()
+
+        //  fn('hi').then((data)=>{
+        //     console.log(data);
+        //     setTimeout(() => {
+        //        console.log(23131313)
+        //     }, 2000)
+            
+        //     fn(12312313132).then(function(data){
+        //         console.log(data)
+        //     })
+        // }).then(()=>{
+        //     console.log('资产支持支持在')
+        // })
     </script>
 </body>
 

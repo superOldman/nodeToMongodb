@@ -9,61 +9,61 @@ let bcrypt = require('bcryptjs');
 
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
 //登录接口
-router.post('/login',function(req,res){
+router.post('/login', function (req, res) {
   let username = req.body.username;
   let password = req.body.password;
 
-  userModel.findOne({username})
-  .exec(function(err, data){
-    bcrypt.compare( password, data.password, function(err, passwordisTure) {
-      let dataJson = {}
-      if(passwordisTure){
-        req.session.username = username;
-        dataJson.code = 0;
-        dataJson.message = '登录成功';
-        // dataJson.userMessage = {
-        //   title:'管理员',
-        //   userName:req.session.username,
-        //   imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-        // }
-      }else{
-        dataJson.code = 1;
-        dataJson.message = '登录失败';
-      }
-      res.send(dataJson);
+  userModel.findOne({ username })
+    .exec(function (err, data) {
+      bcrypt.compare(password, data.password, function (err, passwordisTure) {
+        let dataJson = {}
+        if (passwordisTure) {
+          req.session.username = username;
+          dataJson.code = 0;
+          dataJson.message = '登录成功';
+          // dataJson.userMessage = {
+          //   title:'管理员',
+          //   userName:req.session.username,
+          //   imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+          // }
+        } else {
+          dataJson.code = 1;
+          dataJson.message = '登录失败';
+        }
+        res.send(dataJson);
 
-    });
-  })
+      });
+    })
 });
 
 // 注册
-router.post('/register',function(req,res,next){
+router.post('/register', function (req, res, next) {
   console.log('zhuce', req.body)
   console.log('zhuce', req.query)
-  bcrypt.genSalt(10,function(err, salt){
-    bcrypt.hash(req.body.password,salt,function(err,hash){
+  bcrypt.genSalt(10, function (err, salt) {
+    bcrypt.hash(req.body.password, salt, function (err, hash) {
       userModel.instert({
         username: req.body.username,
         email: req.body.email,
         password: hash,
         updated_at: new Date()
-      }).then(function(data){
+      }).then(function (data) {
         res.send({
           code: 1,
           message: '注册成功'
         })
-      })    
+      })
     })
   })
 });
 
 // 推出登录
-router.get('/logout',function(req,res){
+router.get('/logout', function (req, res) {
   req.session.username = null;
   res.status(401).send({
     code: 1,

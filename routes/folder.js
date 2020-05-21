@@ -51,14 +51,14 @@ router.post('/saveFolder', function (req, res) {
  *
  */
 router.post('/saveEditorFolder', function (req, res) {
-  folderModel.findByIdAndUpdate(req.body._id,req.body,{new:true})
-  .then((data)=>{
+  folderModel.findByIdAndUpdate(req.body._id, req.body, { new: true })
+    .then((data) => {
       res.send({
         code: 0,
         message: '保存成功！',
         data
       })
-  });
+    });
 });
 
 
@@ -73,26 +73,26 @@ router.post('/saveEditorFolder', function (req, res) {
  *  }]
  * }
  * 
- */ 
-router.post('/pushPaper',function(req,res){
+ */
+router.post('/pushPaper', function (req, res) {
   console.log('pushPaper:')
   console.log(req.body)
-  folderModel.findByIdAndUpdate(req.body._id, { $push: { folderHasPaper: req.body.folderHasPaper }},{new: true})
-  .then((data)=>{
-    console.log(data)
-    console.log(data.folderHasPaper)
-    data.folderHasPaper.forEach((item)=>{
-      console.log(data.folderName)
-      htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName}).then()
-    })
-    return data
+  folderModel.findByIdAndUpdate(req.body._id, { $push: { folderHasPaper: req.body.folderHasPaper } }, { new: true })
+    .then((data) => {
+      console.log(data)
+      console.log(data.folderHasPaper)
+      data.folderHasPaper.forEach((item) => {
+        console.log(data.folderName)
+        htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName }).then()
+      })
+      return data
 
-  }).then((data)=>{
-    res.send({
-      code: 0,
-      data: data.folderHasPaper
+    }).then((data) => {
+      res.send({
+        code: 0,
+        data: data.folderHasPaper
+      })
     })
-  })
 })
 
 

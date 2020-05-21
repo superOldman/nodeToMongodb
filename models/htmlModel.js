@@ -66,11 +66,11 @@ class HtmlModel {
     return this.htmlModel.find(data, projection, options);
   }
   // data : {"email":"QQQQ@qq.com"}
-  deleteOne(data,callback){
+  deleteOne(data, callback) {
     return this.htmlModel.deleteOne(data, callback)
   }
-  findByIdAndUpdate(id,doc,options,callback){
-    return this.htmlModel.findByIdAndUpdate(id,doc)
+  findByIdAndUpdate(id, doc, options, callback) {
+    return this.htmlModel.findByIdAndUpdate(id, doc)
   }
 
 }

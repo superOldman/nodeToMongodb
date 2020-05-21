@@ -20,8 +20,6 @@ router.get('/', function (req, res, next) {
 //定义接口
 router.post('/saveHtml', function (req, res) {
 
-  // console.log(req.body)
-
   htmlModel.instert({
     title: req.body.title,
     info: req.body.info,
@@ -42,15 +40,15 @@ router.post('/saveHtml', function (req, res) {
         folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then()
       }
 
-      if (data.hasTags.length){
+      if (data.hasTags.length) {
         // var insertArr = [];
-        data.hasTags.forEach((item)=>{
+        data.hasTags.forEach((item) => {
           // insertArr.push({ name: item })
-          tagModel.update({name: item}, {name: item}, {upsert: true}).then()
+          tagModel.update({ name: item }, { name: item }, { upsert: true }).then()
         })
-        
-      } 
-    }).then(()=>{
+
+      }
+    }).then(() => {
       //保存数据
       res.send({
         code: 1,
@@ -63,7 +61,6 @@ router.post('/saveEditorHtml', function (req, res) {
   let seachId = '';
   let editDoc = {};
   for (let item in req.body) {
-    console.log(item)
     if (item === '_id') {
       seachId = req.body[item]
     } else {
@@ -71,8 +68,6 @@ router.post('/saveEditorHtml', function (req, res) {
     }
   }
 
-  console.log('id:' + seachId)
-  console.log('editDoc:' + editDoc)
   htmlModel
     .findByIdAndUpdate(seachId, editDoc).then(function (data) {
       res.send({
@@ -136,7 +131,6 @@ router.get('/destroy', function (req, res) {
   // console.log(URL.parse(req.url, true)); // 废弃
   // var params = new URL(req.url);
 
-  console.log('id', req.query.id);
   // 根据待办事项的id 来删除它
   htmlModel.deleteOne({ _id: req.query.id }, function (err, doc) {
     if (err) {

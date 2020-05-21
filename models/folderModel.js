@@ -47,7 +47,7 @@ class FolderModel {
   }
   delete() {
     return this.folderModel.delete()
-  } 
+  }
   findOneAndUpdate(conditions, doc, options, callback) {
     return this.folderModel.findOneAndUpdate(conditions, doc, options)
   }

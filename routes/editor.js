@@ -44,7 +44,7 @@ router.post('/saveHtml', function (req, res) {
         // var insertArr = [];
         data.hasTags.forEach((item) => {
           // insertArr.push({ name: item })
-          tagModel.update({ name: item }, { name: item }, { upsert: true }).then()
+          tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then()
         })
 
       }

@@ -14,6 +14,7 @@ var usersRouter = require('./routes/users');
 var editorRouter = require('./routes/editor');
 var searchRouter = require('./routes/search');
 var folderRouter = require('./routes/folder');
+var statsHomeRouter = require('./routes/statsHome');
 
 //实例化
 var app = express();
@@ -127,6 +128,7 @@ app.use('/editor', editorRouter);
 
 app.use('/search', searchRouter);
 app.use('/folder', folderRouter);
+app.use('/statsHome', statsHomeRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -150,5 +152,51 @@ app.use(function (err, req, res, next) {
 // Passport middleware
 // app.use(passport.initialize());
 // app.use(passport.session());
+
+
+
+
+
+// var fs = require('fs');
+// var path = require('path');
+
+// let fileSize = 0;
+// function countFileSize(src) {
+//   //转换为绝对路径
+//   const param = path.resolve(src);
+//   fs.stat(param, function (err, stats) {
+//     //如果是目录的话，遍历目录下的文件信息
+//     if (stats.isDirectory()) {
+//       fs.readdir(param, function (err, file) {
+//         file.forEach((e) => {
+//           //遍历之后递归调用查看文件函数
+//           //遍历目录得到的文件名称是不含路径的，需要将前面的绝对路径拼接
+//           var absolutePath = path.resolve(path.join(param, e));
+//           return countFileSize(absolutePath)
+//         })
+//       })
+//     } else {
+//       //如果不是目录，打印文件信息
+//        fileSize += stats.size / 1024 / 1024;
+//        console.log(fileSize)
+//     }
+//   })
+// }
+
+// console.log(fileSize)
+
+// console.log(countFileSize('public/images'))
+
+// console.log(fs)
+
+
+
+
+
+
+
+
+
+
 
 module.exports = app;

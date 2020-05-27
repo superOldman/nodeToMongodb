@@ -5,7 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        .box {
+            width: 400px;
+            height: 300px;
+            background-color: bisque;
+            position: relative;
+        }
+
+        .box:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-width: 0 42px 42px 0;
+            border-style: solid;
+            border-color: #fff rgba(0, 0, 0, .1);
+            -webkit-box-shadow: 0 0 0 rgba(0, 0, 0, .4), 0 0 10px rgba(0, 0, 0, .3);
+            -moz-box-shadow: 0 0 0 rgba(0, 0, 0, .4), 0 0 10px rgba(0, 0, 0, .3);
+            box-shadow: 0 0 0 rgba(0, 0, 0, .4), 0 0 10px rgba(0, 0, 0, .3);
+            -webkit-transform: rotate(-90deg);
+            -moz-transform: rotate(-90deg);
+            -ms-transform: rotate(-90deg);
+            -o-transform: rotate(-90deg);
+            filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+        }
+    </style>
 </head>
+<div class="box">
+
+
+</div>
 
 <body>
     <script>
@@ -90,10 +120,10 @@
 
 
         function fn(params) {
-            return new Promise((result,reject)=>{
-                setTimeout(()=>{
+            return new Promise((result, reject) => {
+                setTimeout(() => {
                     result(params)
-                },1000)
+                }, 1000)
             })
         }
 
@@ -113,7 +143,7 @@
         //     setTimeout(() => {
         //        console.log(23131313)
         //     }, 2000)
-            
+
         //     fn(12312313132).then(function(data){
         //         console.log(data)
         //     })

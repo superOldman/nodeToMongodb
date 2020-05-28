@@ -10,6 +10,7 @@ var URL = require('url'); //引入URL中间件，获取req中的参数需要
 let htmlModel = require('../models/htmlModel');
 let folderModel = require('../models/folderModel');
 let tagModel = require('../models/tagModel');
+let topModel = require('../models/topModel');
 
 
 /* GET editor listing. */
@@ -17,7 +18,7 @@ router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
-//定义接口
+//保存文章
 router.post('/saveHtml', function (req, res) {
 
   htmlModel.instert({
@@ -57,6 +58,8 @@ router.post('/saveHtml', function (req, res) {
     })
 });
 
+
+//保存编辑过的文章
 router.post('/saveEditorHtml', function (req, res) {
   let seachId = '';
   let editDoc = {};
@@ -104,7 +107,7 @@ router.post('/saveEditorHtml', function (req, res) {
 //   });
 // });
 
-// 上传图片 利用：formidable 保存图片格式还不对 
+// 上传图片 利用：formidable 
 router.post('/uploadImg', function (req, res) {
   const form = formidable({
     multiples: true,
@@ -149,6 +152,38 @@ router.get('/destroy', function (req, res) {
   })
 });
 
+
+// 置顶
+router.post('/setTop', function (req, res) {
+  // let obj = {
+  //   _id: '12313',
+  //   stick: true
+  // }
+  let { _id, stick} = req.body;
+
+  console.log(_id)
+ 
+  console.log(stick)
+  console.log({stick})
+  // topModel.findByIdAndUpdate(_id,{stick},{ new: true })
+  
+  // .then((data,a) => {
+  //   console.log(data,a)
+  //   res.send({
+  //     code: 0,
+  //     success: '成功',
+  //     data
+  //   })
+  // }).catch(err=>{
+  //   console.log(err)
+  // })
+
+    res.send({
+      code: 0,
+      success: '还没写完',
+    })
+
+})
 
 
 module.exports = router;

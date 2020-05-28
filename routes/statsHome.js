@@ -80,13 +80,13 @@ router.get('/visit', async function (req, res) {
 
     // })
     let newTime = myGetTime();
-    // console.log('newTime')
-    // console.log(newTime)
+    console.log('newTime')
+    console.log(newTime)
 
 
     let findData = await visitModel.findOne({ updated_at: newTime}).lean();
-    // console.log('findData')
-    // console.log(findData)
+    console.log('findData')
+    console.log(findData)
     let sendData;
 
     if (findData) {
@@ -100,6 +100,12 @@ router.get('/visit', async function (req, res) {
         // console.log(test)
         // console.log(Array.from(test))
 
+
+        console.log((updated_at))
+        console.log(myGetTime(updated_at))
+        console.log(myGetTime())
+
+        console.log(myGetTime(updated_at) !== myGetTime())
         if (myGetTime(updated_at) !== myGetTime()){
             sendData = await visitModel.instert({ visit: 1, ip: [thisIp] });
         }else{

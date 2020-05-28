@@ -191,10 +191,24 @@ app.use(function (err, req, res, next) {
 
 
 
+// function myGetTime(time) {
+//   let myTime = new Date();
+//   if (time) {
+//     myTime = new Date(time);
+//   }
+
+//   return `${myTime.getFullYear()}-${addZero(myTime.getMonth() + 1)}-${addZero(myTime.getDate())}`
+//   //  `${addZero(myTime.getHours())}:${addZero(myTime.getMinutes())}:${addZero(myTime.getSeconds())}`
+// }
+// function addZero(num) {
+//   return num >= 10 ? num : `0${num}`
+// }
 
 
 
 
+// console.log('test_time')
+// console.log(myGetTime())
 
 
 

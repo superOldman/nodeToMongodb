@@ -135,53 +135,72 @@ router.get('/destroy', function (req, res) {
   // var params = new URL(req.url);
 
   // 根据待办事项的id 来删除它
-  htmlModel.deleteOne({ _id: req.query.id }, function (err, doc) {
-    if (err) {
-      console.log('err', err)
-      return
-    }
-    // console.log(doc) // { n: 1, ok: 1, deletedCount: 1 }
-    htmlModel.find().exec(function (err, data) {
-      if (err) {
-        console.log('err', err)
-        return
-      }
-      res.send({ code: 0, article: data })
+  htmlModel.findOneAndDelete({ _id: req.query.id }).then( function (data) {
+ 
+
+    // 删除 模型数组里某一项
+    // { $pull: { resumeList: { mallId: mallId } } }
+    // { participant: { $elemMatch: { $eq: 1 } } }
+
+
+    console.log(data)
+    folderModel.findOneAndUpdate({ folderName: doc.folderName }, { $pull: { folderHasPaper: { _id: doc._id  }  }}).then(()=>{
+      res.send({ code: 0 })
     })
+      
+    
 
   })
 });
 
 
 // 置顶
-router.post('/setTop', function (req, res) {
-  // let obj = {
-  //   _id: '12313',
-  //   stick: true
-  // }
-  let { _id, stick} = req.body;
+router.post('/setTop', async function (req, res) {
 
-  console.log(_id)
- 
+  var { _id, stick } = req.body;
   console.log(stick)
-  console.log({stick})
-  // topModel.findByIdAndUpdate(_id,{stick},{ new: true })
-  
-  // .then((data,a) => {
-  //   console.log(data,a)
-  //   res.send({
-  //     code: 0,
-  //     success: '成功',
-  //     data
-  //   })
-  // }).catch(err=>{
-  //   console.log(err)
-  // })
+ 
+  if (stick) {
+    const result = await topModel.find().lean();
+    if (result.length < 2) {
 
+
+      const data = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
+
+      var { _id, title, info, saveImageUrl } = data;
+
+      let update = {
+        _id, title, info, cover: saveImageUrl
+      }
+
+      const doc = await topModel.findByIdAndUpdate(_id, update, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
+
+
+      res.send({
+        code: 0,
+        success: doc,
+      })
+
+
+    } else {
+      res.send({
+        code: 1,
+        message: '置顶数量已达到上限'
+      })
+    }
+  } else {
+    await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('title');
+    const data = await topModel.findByIdAndDelete(_id);
     res.send({
       code: 0,
-      success: '还没写完',
+      success: data,
     })
+
+
+  }
+
+
+
 
 })
 

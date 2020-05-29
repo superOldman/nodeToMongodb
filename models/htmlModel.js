@@ -69,6 +69,10 @@ class HtmlModel {
   deleteOne(data, callback) {
     return this.htmlModel.deleteOne(data, callback)
   }
+
+  findOneAndDelete(conditions, options){
+    return this.htmlModel.findByIdAndDelete(conditions, options)
+  }
   findByIdAndUpdate(id, doc, options, callback) {
     return this.htmlModel.findByIdAndUpdate(id, doc)
   }

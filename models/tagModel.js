@@ -1,5 +1,4 @@
-const db = require('../db.js');
-const mongoose = require('mongoose'); //引入对象
+const mongoose = require('../db.js');
 // 置顶列表对象
 class TagModel {
   constructor() {
@@ -15,7 +14,7 @@ class TagModel {
       }
     });
 
-    this.tagModel = db.model('tagList', tagSchema); //将该Schema发布为Model,userList就是集合名称
+    this.tagModel = mongoose.model('tagList', tagSchema, 'tagList'); 
   }
   // 填加
   instert(data) {

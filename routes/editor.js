@@ -129,28 +129,31 @@ router.post('/uploadImg', function (req, res) {
   });
 });
 
-//删除
-router.get('/destroy', function (req, res) {
-  // console.log(URL.parse(req.url, true)); // 废弃
-  // var params = new URL(req.url);
+//删除文章
+router.post('/destroy', async function (req, res) {
+  // 删除 模型数组里某一项
+  // { $pull: { resumeList: { mallId: mallId } } }
 
-  // 根据待办事项的id 来删除它
-  htmlModel.findOneAndDelete({ _id: req.query.id }).then( function (data) {
- 
+  // 查询数组某一项
+  // { participant: { $elemMatch: { $eq: 1 } } }
 
-    // 删除 模型数组里某一项
-    // { $pull: { resumeList: { mallId: mallId } } }
-    // { participant: { $elemMatch: { $eq: 1 } } }
+  try {
 
-
-    console.log(data)
-    folderModel.findOneAndUpdate({ folderName: doc.folderName }, { $pull: { folderHasPaper: { _id: doc._id  }  }}).then(()=>{
-      res.send({ code: 0 })
+    await folderModel.findOneAndUpdate({ folderHasPaper: { $elemMatch: { _id: req.body._id } } }, { $pull: { folderHasPaper: { _id: req.body._id } } });
+    // 根据待办事项的id 来删除它
+    const result = await htmlModel.findByIdAndDelete(req.body._id);
+    res.send({
+      code: 0,
+      data: result
     })
-      
-    
+  } catch (err) {
+    console.log(err)
+  }
 
-  })
+
+
+
+  // })
 });
 
 
@@ -159,7 +162,7 @@ router.post('/setTop', async function (req, res) {
 
   var { _id, stick } = req.body;
   console.log(stick)
- 
+
   if (stick) {
     const result = await topModel.find().lean();
     if (result.length < 2) {

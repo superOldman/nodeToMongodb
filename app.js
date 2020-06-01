@@ -211,6 +211,30 @@ app.use(function (err, req, res, next) {
 // console.log(myGetTime())
 
 
+let testMod = require('./models/testMod.js');
 
+// console.log(testMod.testModel)
 
+// testMod.getMod({
+//   name: 'qqq',
+//   arr: [
+//     { id: 1, content: '11111' },
+//     { id: 2, content: '22222' },
+//   ]
+// }).save().then(data =>{
+//   console.log(data)
+// })
+// {
+//   arr: [{ id: 1, content: '11111' }, { id: 2, content: '22222' }],
+//     updated_at: 2020 - 06 - 01T08: 58: 00.120Z,
+//       _id: 5ed4c318f7a4e6b8b0e99082,
+//         name: 'qqq',
+//           __v: 0
+// }
+// testMod.getMod().findByIdAndUpdate('5ed4b1c07bf5e7d0ac922626', { $set: { name: 'zy2' } }, { new: true }).then(data => {
+//   console.log(data)
+// })
+// testMod.getMod().findByIdAndUpdate('5ed4c318f7a4e6b8b0e99082', { $pull: { arr: {id:1} } }, { new: true }).then(data => {
+//   console.log(data)
+// })
 module.exports = app;

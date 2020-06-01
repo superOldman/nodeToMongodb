@@ -1,5 +1,5 @@
-const db = require('../db.js');
-const mongoose = require('mongoose'); //引入对象
+const mongoose = require('../db.js');
+
 // 文章列表对象
 class FolderModel {
   constructor() {
@@ -28,7 +28,7 @@ class FolderModel {
       }
     });
 
-    this.folderModel = db.model('folderList', folderSchema); //将该Schema发布为Model,userList就是集合名称
+    this.folderModel = mongoose.model('folderList', folderSchema, 'folderList');
   }
   // 填加
   instert(data) {

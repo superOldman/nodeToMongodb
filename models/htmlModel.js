@@ -1,5 +1,4 @@
-const db = require('../db.js');
-const mongoose = require('mongoose'); //引入对象
+const mongoose = require('../db.js');
 // 文章列表对象
 class HtmlModel {
   constructor() {
@@ -47,7 +46,7 @@ class HtmlModel {
       }
     });
 
-    this.htmlModel = db.model('paperList', htmlSchema); //将该Schema发布为Model,userList就是集合名称
+    this.htmlModel = mongoose.model('paperList', htmlSchema, 'paperList'); //将该Schema发布为Model,userList就是集合名称
   }
   schema() {
     return this.htmlModel
@@ -70,7 +69,10 @@ class HtmlModel {
     return this.htmlModel.deleteOne(data, callback)
   }
 
-  findOneAndDelete(conditions, options){
+  findOneAndDelete(conditions, options) {
+    return this.htmlModel.findOneAndDelete(conditions, options)
+  }
+  findByIdAndDelete(conditions, options) {
     return this.htmlModel.findByIdAndDelete(conditions, options)
   }
   findByIdAndUpdate(id, doc, options, callback) {

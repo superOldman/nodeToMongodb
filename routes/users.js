@@ -43,8 +43,7 @@ router.post('/login', function (req, res) {
 
 // 注册
 router.post('/register', function (req, res, next) {
-  console.log('zhuce', req.body)
-  console.log('zhuce', req.query)
+
   bcrypt.genSalt(10, function (err, salt) {
     bcrypt.hash(req.body.password, salt, function (err, hash) {
       userModel.instert({

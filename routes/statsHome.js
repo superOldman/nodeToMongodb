@@ -71,6 +71,8 @@ function addZero(num) {
     return num >= 10 ? num : `0${num}`
 }
 
+
+// 访问统计接口
 router.get('/visit', async function (req, res) {
     let thisIp = getIp(req)
     // visitModel.findOneAndUpdate({}, { $push: { ip } }, { new: true, upsert: true, setDefaultsOnInsert: true })
@@ -122,7 +124,7 @@ router.get('/visit', async function (req, res) {
 })
 
 
-
+//  访问统计列表
 router.get('/visitList', async function (req, res) {
     let findData = await visitModel.find();
     res.send({
@@ -131,6 +133,8 @@ router.get('/visitList', async function (req, res) {
     })
 })
 
+
+// 图片存储量
 router.get('/picturesStats', async function (req, res) {
 
     const pictureDetail = await countFileSize('public/images')

@@ -1,5 +1,4 @@
-const db = require('../db.js');
-const mongoose = require('mongoose'); //引入对象
+const mongoose = require('../db.js');
 
 class UserModel {
   constructor() {
@@ -22,7 +21,7 @@ class UserModel {
       }
     });
 
-    this.userModel = db.model('userList', userSchema); //将该Schema发布为Model,userList就是集合名称
+    this.userModel = mongoose.model('userList', userSchema, 'userList'); //将该Schema发布为Model,userList就是集合名称
   }
 
   // 注册用户

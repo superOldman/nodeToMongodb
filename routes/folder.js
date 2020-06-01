@@ -75,14 +75,12 @@ router.post('/saveEditorFolder', function (req, res) {
  * 
  */
 router.post('/pushPaper', function (req, res) {
-  console.log('pushPaper:')
-  console.log(req.body)
+
   folderModel.findByIdAndUpdate(req.body._id, { $push: { folderHasPaper: req.body.folderHasPaper } }, { new: true })
     .then((data) => {
-      console.log(data)
-      console.log(data.folderHasPaper)
+     
       data.folderHasPaper.forEach((item) => {
-        console.log(data.folderName)
+       
         htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName }).then()
       })
       return data

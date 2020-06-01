@@ -1,5 +1,5 @@
-const db = require('../db.js');
-const mongoose = require('mongoose'); //引入对象
+const mongoose = require('../db.js');
+
 // 置顶列表对象
 class TopModel {
   constructor() {
@@ -23,7 +23,7 @@ class TopModel {
       }
     });
 
-    this.topModel = db.model('topList', topSchema); //将该Schema发布为Model,userList就是集合名称
+    this.topModel = mongoose.model('topList', topSchema, 'topList'); 
   }
   // 填加
   instert(data) {

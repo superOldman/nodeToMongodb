@@ -134,7 +134,7 @@ router.get('/visit', async function (req, res) {
 
 //  访问统计列表
 router.get('/visitList', async function (req, res) {
-    let findData = await visitModel.find();
+    let findData = await visitModel.find().sort({updated_at: 1});
     res.send({
         code: 0,
         data: findData

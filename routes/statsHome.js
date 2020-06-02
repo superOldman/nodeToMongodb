@@ -25,11 +25,12 @@ function countFileSize(src) {
     })
 }
 
-let collections = []
-for (let key in mongoose.connection.collections) {
-    collections.push(mongoose.connection.collection(key).stats())
-}
+
 function getCollections() {
+    let collections = []
+    for (let key in mongoose.connection.collections) {
+        collections.push(mongoose.connection.collection(key).stats())
+    }
     return Promise.all(collections)
 }
 /**
@@ -60,10 +61,10 @@ function getIp(req) {
 
 function myGetTime(time) {
     let myTime = new Date();
-    if(time){
+    if (time) {
         myTime = new Date(time);
     }
-    
+
     return `${myTime.getFullYear()}-${addZero(myTime.getMonth() + 1)}-${addZero(myTime.getDate())}`
     //  `${addZero(myTime.getHours())}:${addZero(myTime.getMinutes())}:${addZero(myTime.getSeconds())}`
 }
@@ -71,6 +72,13 @@ function addZero(num) {
     return num >= 10 ? num : `0${num}`
 }
 
+function kbOrmb(size) {
+    if ((size / 1024 / 1024) > 0) {
+        return (size / 1024).toFixed(2) + 'kb'
+    } else {
+        return (size / 1024 / 1024).toFixed(2) + 'mb'
+    }
+}
 
 // 访问统计接口
 router.get('/visit', async function (req, res) {
@@ -86,7 +94,7 @@ router.get('/visit', async function (req, res) {
     console.log(newTime)
 
 
-    let findData = await visitModel.findOne({ updated_at: newTime}).lean();
+    let findData = await visitModel.findOne({ updated_at: newTime }).lean();
     console.log('findData')
     console.log(findData)
     let sendData;
@@ -96,7 +104,7 @@ router.get('/visit', async function (req, res) {
         let { visit, ip, updated_at, ...lastData } = findData;
         visit++;
         ip.push(thisIp);
-        
+
         // 去重
         // let test = new Set([...ip]);
         // console.log(test)
@@ -108,9 +116,9 @@ router.get('/visit', async function (req, res) {
         console.log(myGetTime())
 
         console.log(myGetTime(updated_at) !== myGetTime())
-        if (myGetTime(updated_at) !== myGetTime()){
+        if (myGetTime(updated_at) !== myGetTime()) {
             sendData = await visitModel.instert({ visit: 1, ip: [thisIp] });
-        }else{
+        } else {
             sendData = await visitModel.findOneAndUpdate({ updated_at }, { visit, ip }, { new: true });
 
         }
@@ -135,49 +143,29 @@ router.get('/visitList', async function (req, res) {
 
 
 // 图片存储量
-router.get('/picturesStats', async function (req, res) {
+router.get('/resourceStats', async function (req, res) {
 
     const pictureDetail = await countFileSize('public/images')
     const baseData = await getCollections();
-    // console.log(req.connection)
-    console.log(getIp(req))
-    console.log(req.connection.remoteAddress)
 
-
-    let tj = 0;
+    let tj = 0; // 统计数据库大小
     let paperDetail = {
         count: 0,
         size: 0
     }
     baseData.forEach(item => {
-        let size = item.size
+        let size = item.size;
         tj += size;
-        if (item.ns.endsWith('paperlists')) {
+        if (item.ns.endsWith('paperList')) {
 
             paperDetail.count = item.count;
-            let paperDetailSize = 0;
-            if ((size / 1024 / 1024) > 0) {
-                paperDetailSize = size / 1024 + 'kb'
-            } else {
-                paperDetailSize = size / 1024 / 1024 + 'mb'
-            }
-            paperDetail.size = paperDetailSize;
+            paperDetail.size = kbOrmb(size);
         }
     });
 
-
-    console.log(paperDetail)
-    // baseData = {
-    //     ns: 'editor.paperlists',
-    //     size: 144327,
-    //     count: 23,
-    //     avgObjSize: 6275,
-    //     storageSize: 69632,
-    //     capped: false,
-    // }
     res.send({
         pictureDetail,
-        baseDataSize: (tj / 1024 / 1024).toFixed(2) + 'mb',
+        baseDataSize: kbOrmb(tj),
         paperDetail,
     })
 

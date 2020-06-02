@@ -64,6 +64,9 @@ class HtmlModel {
   find(data, projection, options) {
     return this.htmlModel.find(data, projection, options);
   }
+  findById(data, projection, options) {
+    return this.htmlModel.findById(data, projection, options);
+  }
   // data : {"email":"QQQQ@qq.com"}
   deleteOne(data, callback) {
     return this.htmlModel.deleteOne(data, callback)

@@ -125,7 +125,7 @@ router.get('/topList', function (req, res, next) {
 router.get('/folderAndTagList', function (req, res, next) {
   // , tagModel.find(), 
   // , folderModel.find()
-  Promise.all([folderModel.find({}, null, { lean: true }), tagModel.find({}, null, { lean: true })]).then((data) => {
+  Promise.all([folderModel.find().lean(), tagModel.find().lean()]).then((data) => {
     res.send({
       code: 0,
       data: {
@@ -134,27 +134,14 @@ router.get('/folderAndTagList', function (req, res, next) {
       }
     })
   })
-  // topModel.find({}, null, { limit: 2 }).exec(function (err, doc) {
-  //   res.send({
-  //     code: 0,
-  //     data: doc
-  //   })
-  // })
+
 })
-// router.get('/search', function(req, res, next) {
-//   console.log('search接口',req.session)
-//   testModel.
-//   find().
-//   // sort('updated_at').
-//   exec(function(err, aa, count) {
-//     res.send(aa);
-//   });
-// });
+
 
 // 按照id查找文章
 router.get('/searchById', function (req, res, next) {
   htmlModel.findOne({ _id: req.query.id })
-    .exec(function (err, data, count) {
+    .exec(function (err, data) {
       if (err) {
         console.log(err)
       } else {
@@ -170,15 +157,6 @@ router.get('/searchById', function (req, res, next) {
 
 
 
-// //更新
-// router.post('/update',function(req,res){
-//   TodoModel.findById(req.body._id,function(err,todo){
-//     console.log(todo)
-//     todo.name=req.body.name;
-//     todo.updated_at=Date.now();
-//     todo.save();
-//   })
-//  res.redirect('/'); //返回首页
-// })
+
 
 module.exports = router;

@@ -34,13 +34,16 @@ class FolderModel {
   instert(data) {
     return this.folderModel(data).save();
   }
-  // 查找
+  
   findOne(data) {
     return this.folderModel.findOne(data);
   }
-  // 查找
+  
   find(findData, projection, options) {
     return this.folderModel.find(findData, projection, options);
+  }
+  findById(findData, projection, options) {
+    return this.folderModel.findById(findData, projection, options);
   }
   deleteOne(data, callback) {
     return this.folderModel.deleteOne(data, callback)

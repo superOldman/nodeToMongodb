@@ -33,6 +33,8 @@ router.post('/saveHtml', function (req, res) {
   })
     .then(function (data) {
 
+
+      // 添加到文件夹列表
       if (data.hasFolder) {
         //* folderHasPaper：[{
         //*    _id: 文章id,
@@ -52,7 +54,7 @@ router.post('/saveHtml', function (req, res) {
     }).then(() => {
       //保存数据
       res.send({
-        code: 1,
+        code: 0,
         message: '保存成功'
       });
     })
@@ -60,24 +62,56 @@ router.post('/saveHtml', function (req, res) {
 
 
 //保存编辑过的文章
-router.post('/saveEditorHtml', function (req, res) {
-  let seachId = '';
-  let editDoc = {};
-  for (let item in req.body) {
-    if (item === '_id') {
-      seachId = req.body[item]
-    } else {
-      editDoc[item] = req.body[item];
+router.post('/saveEditorHtml', async function (req, res) {
+  // let seachId = '';
+  // let editDoc = {};
+  // for (let item in req.body) {
+  //   if (item === '_id') {
+  //     seachId = req.body[item]
+  //   } else {
+  //     editDoc[item] = req.body[item];
+  //   }
+  // }
+  const { _id, ...editDoc } = req.body;
+  // editDoc.hasTags
+  // editDoc.hasFolder
+  console.log(_id)
+  console.log(editDoc)
+  const result = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1 })
+  console.log(result)
+  const { hasFolder, hasTags } = result;
+
+
+  // 查看是否修改了标签
+  let clearup = {};
+  editDoc.hasTags.forEach(item => {
+    for (let i = 0; i < hasTags.length; i++) {
+      if (item === hasTags[i]) {
+        delete clearup[item]
+        break
+      }
+      clearup[item] = true;
     }
+  })
+
+  const clearupArr = Object.keys(clearup);
+  if (clearupArr.length) {
+    clearupArr.forEach(item => {
+      tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then()
+    })
   }
 
-  htmlModel
-    .findByIdAndUpdate(seachId, editDoc).then(function (data) {
-      res.send({
-        code: 1,
-        message: '修改成功'
-      })
-    })
+  // 查看是否修改了文件夹
+
+  if (hasFolder !== editDoc.hasFolder) {
+    folderModel.findOneAndUpdate({ folderName: hasFolder }, { $pull: { folderHasPaper: { _id: _id } } }).then();
+    folderModel.findOneAndUpdate({ folderName: editDoc.hasFolder }, { $push: { folderHasPaper: { _id: _id, title: editDoc.title } } }).then();
+
+  }
+
+  await htmlModel.findByIdAndUpdate(_id, editDoc)
+  res.send({ code: 0, message: '修改成功' })
+
 })
 
 
@@ -130,7 +164,7 @@ router.post('/uploadImg', function (req, res) {
 });
 
 //删除文章
-router.post('/destroy', async function (req, res) {
+router.post('/destroy', async function (req, res) { // 接收 _id
   // 删除 模型数组里某一项
   // { $pull: { resumeList: { mallId: mallId } } }
 
@@ -138,6 +172,8 @@ router.post('/destroy', async function (req, res) {
   // { participant: { $elemMatch: { $eq: 1 } } }
 
   try {
+    // 尝试删除top列表 
+    await topModel.findByIdAndDelete(req.body._id);
 
     await folderModel.findOneAndUpdate({ folderHasPaper: { $elemMatch: { _id: req.body._id } } }, { $pull: { folderHasPaper: { _id: req.body._id } } });
     // 根据待办事项的id 来删除它
@@ -150,10 +186,6 @@ router.post('/destroy', async function (req, res) {
     console.log(err)
   }
 
-
-
-
-  // })
 });
 
 

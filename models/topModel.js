@@ -33,10 +33,15 @@ class TopModel {
   findOne(data) {
     return this.topModel.findOne(data);
   }
-  // 查找
+  
   find(findData, projection, options) {
     return this.topModel.find(findData, projection, options);
   }
+  findById(id, projection, options) {
+    return this.topModel.find(id, projection, options);
+  }
+
+
   deleteOne(data, callback) {
     return this.topModel.deleteOne(data, callback)
   }

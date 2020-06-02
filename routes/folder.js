@@ -9,18 +9,17 @@ let htmlModel = require('../models/htmlModel');//引入模型
 
 // 文件夹列表
 router.get('/getFolderList', function (req, res) {
-  folderModel.find()
-    .then(function (data) {
-      res.send({
-        code: 0,
-        data
-      })
+  folderModel.find().then(function (data) {
+    res.send({
+      code: 0,
+      data
     })
+  })
 })
 
 /**
  * 新增文件夹
- * 
+ * @params
  * req.body = {
  *   "info": "测试简介",
  *   "folderName": "javascript",
@@ -41,7 +40,7 @@ router.post('/saveFolder', function (req, res) {
 
 /**
  * 修改文件夹
- *
+ * @params
  * req.body = {
  *   "_id": "5ec25fd5f7ff21b2409e6822", *
  *   "info": "测试简介",
@@ -64,7 +63,7 @@ router.post('/saveEditorFolder', function (req, res) {
 
 /** 
  * 向文件夹添加文章
- * 
+ * @params
  * req.body = {
  *  _id： 文件夹id,
  *  folderHasPaper： [{
@@ -78,9 +77,11 @@ router.post('/pushPaper', function (req, res) {
 
   folderModel.findByIdAndUpdate(req.body._id, { $push: { folderHasPaper: req.body.folderHasPaper } }, { new: true })
     .then((data) => {
-     
+
+
+      // 更新文章属性
       data.folderHasPaper.forEach((item) => {
-       
+
         htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName }).then()
       })
       return data
@@ -97,20 +98,27 @@ router.post('/pushPaper', function (req, res) {
 
 /**
  * 删除文件夹
- *
+ * @params 
  * req.body = {
  *  _id： 文件夹id,
  * }
  *
  */
-router.post('/deleteFolder', function (req, res) {
-  folderModel.findByIdAndDelete(req.body._id)
-    .then((data) => {
-      res.send({
-        code: 0,
-        message: '删除成功！'
-      })
-    })
+router.post('/deleteFolder', async function (req, res) {
+
+  // 先删除文件夹里面的文章的归属
+  const { folderHasPaper } = await folderModel.findById(req.body._id, 'folderHasPaper');
+
+  folderHasPaper.forEach((item) => {
+    htmlModel.findByIdAndUpdate(item._id, { hasFolder: '' }).exec();
+  })
+
+  const result = await folderModel.findByIdAndDelete(req.body._id);
+
+  console.log(result)
+
+  res.send({ code: 0, message: '删除成功！' })
+
 })
 
 

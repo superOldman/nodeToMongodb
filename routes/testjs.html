@@ -39,117 +39,36 @@
 
 <body>
     <script>
-        let arr = [{
-            "_id": {
-                "$oid": "5ebe87e44064e7cc2ce86e22"
-            },
-            "hasTags": [
-                "的味道",
-                "的味道",
-                "的味道",
-                "的味道",
-                "111"
-            ],
-            "updated_at": {
-                "$date": "2020-05-15T12:11:06.230Z"
-            },
-            "title": "大沙发斯蒂芬",
-            "info": "简介...",
-            "content": "<h6",
-            "markdown": "sdfsaf",
-            "author": "superOldman",
-            "saveImageUrl": "http://localhost:3000/public\\images\\upload_39c9c08aae073eec28b8b8f765dd4113",
-            "hasFolder": "jsj1",
-            "__v": 0
-        }, {
-            "_id": {
-                "$oid": "5ec20a76725b2911081abd42"
-            },
-            "hasTags": [
-                "的味道",
-                "的味道",
-                "的味道",
-                "的味道",
-                "111"
-            ],
-            "updated_at": {
-                "$date": "2020-05-15T12:11:06.230Z"
-            },
-            "title": "大沙发斯蒂芬",
-            "info": "简介...",
-            "content": "<h6 id=\"h6-n",
-            "markdown": "sdfsaf",
-            "author": "superOldman",
-            "saveImageUrl": "http://localhost:3000/public\\images\\upload_39c9c08aae073eec28b8b8f765dd4113",
-            "hasFolder": "jsj1",
-            "__v": 0
-        }]
+        var a = ['1', 'a', 'v']; // old
 
-        // let result = arr.filter((item)=>{
 
-        //     console.log(Object.keys(item))
+        var b = [ 'b','1','a']; // new
 
-        //     return true 
-        // })
+        var concat = new Set([...a, ...b]);
 
-        // let newArr = []
-        // arr.forEach((item)=>{
-
-        //     delete item.age
-        //     delete item.markdown
-
-        // })
-        // console.log(arr)
+        console.log(concat)
+        var arr = Array.from(concat)
+        console.log(arr);
 
 
 
-        let dealDoc = []
-        arr.forEach((item) => {
-            let obj = {};
-            // Object.keys(item).forEach((keys)=>{
-            for (let key in item) {
-                if (key === 'content' || key === 'markdown') {
-                    continue
-                }
-                obj[key] = item[key]
-            }
-            // })
-            dealDoc.push(obj)
+
+        var c = JSON.stringify(a) === JSON.stringify(b);
+
+        var obj = {};
+        b.forEach((_b) => {
+           for(let i=0;i<a.length;i++){
+               if (_b === a[i]) {
+                   delete obj[_b]
+                   break
+               }
+               obj[_b] = true
+           }
         })
-        console.log(dealDoc)
+        // }
+        console.log(Object.keys(obj))
 
 
-        function fn(params) {
-            return new Promise((result, reject) => {
-                setTimeout(() => {
-                    result(params)
-                }, 1000)
-            })
-        }
-
-
-        async function test() {
-            let con1 = await fn('hi');
-            console.log(con1)
-            let con2 = await fn(11111111111111);
-            console.log(con2)
-            console.log('dsfasdfasfasfafs')
-        }
-
-        test()
-
-        //  fn('hi').then((data)=>{
-        //     console.log(data);
-        //     setTimeout(() => {
-        //        console.log(23131313)
-        //     }, 2000)
-
-        //     fn(12312313132).then(function(data){
-        //         console.log(data)
-        //     })
-        // }).then(()=>{
-        //     console.log('资产支持支持在')
-        // })
     </script>
 </body>
 

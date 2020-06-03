@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const mongoose = require('../db.js')
 const visitModel = require('../models/visitModel.js');
+const htmlModel = require('../models/htmlModel.js');
 
 function countFileSize(src) {
     return new Promise(function (result, reject) {
@@ -134,7 +135,7 @@ router.get('/visit', async function (req, res) {
 
 //  访问统计列表
 router.get('/visitList', async function (req, res) {
-    let findData = await visitModel.find().sort({updated_at: 1});
+    let findData = await visitModel.find().sort({ updated_at: 1 });
     res.send({
         code: 0,
         data: findData
@@ -169,8 +170,30 @@ router.get('/resourceStats', async function (req, res) {
         paperDetail,
     })
 
-
 })
+
+// 图片存储量
+router.get('/lastYearPushPaperCount', async function (req, res) {
+    const result = await htmlModel.find({}, { updated_at: 1 }).sort({ updated_at: 1 });
+    let pushPaperDate = [];
+    let _index = 0;
+    let lastData;
+    result.forEach((item, index) => {
+        if (lastData === myGetTime(item.updated_at)) {
+
+            pushPaperDate[_index][1]++;
+        } else {
+            index !== 0 ? _index++ : null
+            lastData = myGetTime(item.updated_at);
+            pushPaperDate[_index] = [lastData, 1];
+        }
+    })
+    res.send({
+        code: 0,
+        data: pushPaperDate
+    })
+})
+
 
 
 module.exports = router;

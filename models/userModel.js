@@ -18,6 +18,15 @@ class UserModel {
       updated_at: {
         type: Date,
         default: new Date()
+      },     
+      photo: {
+        type: String,
+        required: false
+      },
+      
+      lastLogin: {
+        type: Date,
+        default: new Date()
       }
     });
 
@@ -31,12 +40,17 @@ class UserModel {
     return user.save();
   }
   // 查找
-  findOne(data) {
-    return this.userModel.findOne({
-      userName: data.userName
-    });
+  findOne(data, options) {
+    return this.userModel.findOne(data, options);
   }
 
+  findOneAndUpdate(conditions, doc, options, callback) {
+    return this.userModel.findOneAndUpdate(conditions, doc, options)
+  }
+  
+  findOneAndDelete(conditions, options) {
+    return this.userModel.findOneAndDelete(conditions, options)
+  }
   async singup(req, res, next) {
     res.header('Access-Control-Allow-Headers');
 

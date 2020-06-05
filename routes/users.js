@@ -14,31 +14,80 @@ router.get('/', function (req, res, next) {
 });
 
 //登录接口
-router.post('/login', function (req, res) {
+router.post('/login', async function (req, res) {
   let username = req.body.username;
   let password = req.body.password;
 
-  userModel.findOne({ username })
-    .exec(function (err, data) {
-      bcrypt.compare(password, data.password, function (err, passwordisTure) {
-        let dataJson = {}
-        if (passwordisTure) {
-          req.session.username = username;
-          dataJson.code = 0;
-          dataJson.message = '登录成功';
-          // dataJson.userMessage = {
-          //   title:'管理员',
-          //   userName:req.session.username,
-          //   imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-          // }
-        } else {
-          dataJson.code = 1;
-          dataJson.message = '登录失败';
-        }
-        res.send(dataJson);
 
-      });
-    })
+  const result = await userModel.findOneAndUpdate({ username }, { lastLogin: new Date() })
+
+  bcrypt.compare(password, result.password, function (err, passwordisTure) {
+    if (err) {
+      console.log('err', err)
+    }
+
+
+    let dataJson = {}
+    if (passwordisTure) {
+      req.session.username = username;
+      dataJson.code = 0;
+      dataJson.message = '登录成功';
+      dataJson.lastLogin = result.lastLogin
+      // dataJson.userMessage = {
+      //   title:'管理员',
+      //   userName:req.session.username,
+      //   imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+      // }
+    } else {
+      dataJson.code = 1;
+      dataJson.message = '登录失败,密码错误！';
+    }
+    res.send(dataJson);
+
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // userModel.findOne({ username })
+  //   .exec(function (err, data) {
+
+
+  //     bcrypt.compare(password, data.password, function (err, passwordisTure) {
+  //       if(err){
+  //         console.log('err',err)
+  //       }
+
+
+  //       let dataJson = {}
+  //       if (passwordisTure) {
+  //         req.session.username = username;
+  //         dataJson.code = 0;
+  //         dataJson.message = '登录成功';
+  //         dataJson.lastLogin = data.lastLogin
+  //         // dataJson.userMessage = {
+  //         //   title:'管理员',
+  //         //   userName:req.session.username,
+  //         //   imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+  //         // }
+  //       } else {
+  //         dataJson.code = 1;
+  //         dataJson.message = '登录失败';
+  //       }
+  //       res.send(dataJson);
+
+  //     });
+  //   })
 });
 
 // 注册
@@ -50,10 +99,9 @@ router.post('/register', function (req, res, next) {
         username: req.body.username,
         email: req.body.email,
         password: hash,
-        updated_at: new Date()
       }).then(function (data) {
         res.send({
-          code: 1,
+          code: 0,
           message: '注册成功'
         })
       })
@@ -61,7 +109,9 @@ router.post('/register', function (req, res, next) {
   })
 });
 
-// 推出登录
+// 退出登录
+// req.body.last
+
 router.get('/logout', function (req, res) {
   req.session.username = null;
   res.status(401).send({
@@ -69,6 +119,120 @@ router.get('/logout', function (req, res) {
     message: '请重新登录！'
   });
 });
+
+// 更新
+router.post('/userUpdate', async function (req, res) {
+  console.log('req.session.username', req.session.username)
+  console.log('req.body', req.body.username)
+
+
+  let { username, photo, userMessage } = req.body;
+  if (req.session.username === username) {
+
+    if (photo) {
+      await userModel.findOneAndUpdate({ username: req.session.username }, { photo });
+
+    }
+    console.log('userUpdate.req', req.body)
+    console.log('before:userMessage', userMessage)
+    if (userMessage) {
+
+      console.log('userMessage', userMessage)
+      const result = await userModel.findOne({ username: req.session.username }, { password: 1 });
+      console.log('result', result)
+
+      // 验证
+      bcrypt.compare(userMessage.oldPass, result.password, function (err, passwordisTure) {
+        if (err) {
+          console.log('err', err)
+        }
+
+        console.log('passwordisTure', passwordisTure)
+        if (passwordisTure) {
+
+          bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(req.body.userMessage.newPass, salt, function (err, hash) {
+              userModel.findOneAndUpdate({ username: req.session.username }, { password: hash }).then((data) => {
+                if (data) {
+                  console.log('data', data)
+                  // res.status(401).send({
+                  req.session.username = null;
+                  res.send({
+                    code: 0,
+                    message: '修改成功，请重新登陆！'
+                  });
+                } else {
+                  res.send(data)
+                }
+
+              })
+
+            })
+          })
+
+        } else {
+          res.send({
+            code: 1,
+            message: '旧密码不正确！'
+          })
+        }
+      });
+
+
+
+    } else {
+      res.send({
+        code: 0,
+        message: '修改成功！'
+      })
+    }
+  } else {
+    // req.session.username = null;
+    // res.status(401).send({
+    //   code: 1,
+    //   message: '请重新登录！'
+    // });
+    res.send({
+      code: 1,
+      message: '用户名错误',
+      data: req.body
+    })
+  }
+
+
+});
+
+
+
+
+
+
+// 注销账号
+router.post('/writeOff', async function (req, res) {
+  if (req.session.username === req.body.username) {
+    const result = await userModel.findOneAndDelete({ username: req.body.username});
+
+
+    req.session.username = null;
+    res.status(401).send({
+      code: 0,
+      message: '注销成功！',
+      result
+    });
+
+  } else {
+    res.send({
+      code: 1,
+      message: '出错了！'
+    });
+
+  }
+});
+
+
+
+
+
 
 module.exports = router;
 

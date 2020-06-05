@@ -6,6 +6,7 @@ let htmlModel = require('../models/htmlModel');
 let folderModel = require('../models/folderModel');
 let tagModel = require('../models/tagModel');
 let topModel = require('../models/topModel');
+let userModel = require('../models/userModel');
 
 
 /* GET home page. */
@@ -18,21 +19,24 @@ router.get('/', function (req, res, next) {
 
 
 // 判断登陆
-router.get('/islogin', function (req, res, next) {
+router.get('/islogin', async function (req, res, next) {
   if (!req.session.username) {
     res.status(403).send({
       code: 1,
       message: '请登录！'
     });
   } else {
+    const result = await userModel.findOne({username: req.session.username}, { password: 0});
+    console.log('islogin.result',result)
     res.send({
       code: 0,
       message: '已经登陆！',
       username: req.session.username,
       userMessage: {
         title: '管理员',
-        userName: req.session.username,
-        imgUrl: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+        userName: result.username,
+        lastLogin: result.lastLogin,
+        photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
       }
     });
   }

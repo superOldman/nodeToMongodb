@@ -3,6 +3,7 @@ var router = express.Router();
 
 // user对象
 let userModel = require('../models/userModel');
+let htmlModel = require('../models/htmlModel');
 
 // 加密
 let bcrypt = require('bcryptjs');
@@ -19,9 +20,9 @@ router.post('/login', async function (req, res) {
   let password = req.body.password;
 
 
-  const result = await userModel.findOneAndUpdate({ username }, { lastLogin: new Date() })
+  const result = await userModel.findOneAndUpdate({ username }, { $push: { lastLogin: new Date() } })
 
-  bcrypt.compare(password, result.password, function (err, passwordisTure) {
+  bcrypt.compare(password, result.password, async function (err, passwordisTure) {
     if (err) {
       console.log('err', err)
     }
@@ -29,10 +30,16 @@ router.post('/login', async function (req, res) {
 
     let dataJson = {}
     if (passwordisTure) {
+      const len = result.lastLogin.length;
+      const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
+      if (len >= 10) {
+        await userModel.findOneAndUpdate({ username }, { $shift: { lastLogin: 1 } })
+
+      }
       req.session.username = username;
       dataJson.code = 0;
       dataJson.message = '登录成功';
-      dataJson.lastLogin = result.lastLogin
+      dataJson.lastLogin = lastLogin
       // dataJson.userMessage = {
       //   title:'管理员',
       //   userName:req.session.username,
@@ -89,6 +96,14 @@ router.post('/login', async function (req, res) {
   //     });
   //   })
 });
+
+router.post('/getUserInfo', async function (req, res) { 
+  htmlModel.find({ username: req.body.username }, { hasFolder: 1}).then((data) => {
+    res.send(data);
+  })
+})
+
+
 
 // 注册
 router.post('/register', function (req, res, next) {
@@ -210,7 +225,7 @@ router.post('/userUpdate', async function (req, res) {
 // 注销账号
 router.post('/writeOff', async function (req, res) {
   if (req.session.username === req.body.username) {
-    const result = await userModel.findOneAndDelete({ username: req.body.username});
+    const result = await userModel.findOneAndDelete({ username: req.body.username });
 
 
     req.session.username = null;

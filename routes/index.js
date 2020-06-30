@@ -28,6 +28,9 @@ router.get('/islogin', async function (req, res, next) {
   } else {
     const result = await userModel.findOne({username: req.session.username}, { password: 0});
     console.log('islogin.result',result)
+    const len = result.lastLogin.length;
+    const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
+
     res.send({
       code: 0,
       message: '已经登陆！',
@@ -35,7 +38,7 @@ router.get('/islogin', async function (req, res, next) {
       userMessage: {
         title: '管理员',
         userName: result.username,
-        lastLogin: result.lastLogin,
+        lastLogin: lastLogin,
         photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
       }
     });

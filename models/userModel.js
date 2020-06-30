@@ -25,8 +25,8 @@ class UserModel {
       },
       
       lastLogin: {
-        type: Date,
-        default: new Date()
+        type: Array,
+        default: []
       }
     });
 

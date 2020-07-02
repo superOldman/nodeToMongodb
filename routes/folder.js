@@ -1,10 +1,8 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-
-let folderModel = require('../models/folderModel');//引入模型
-let htmlModel = require('../models/htmlModel');//引入模型
-
+const folderModel = require('../models/folderModel');//引入模型
+const htmlModel = require('../models/htmlModel');//引入模型
 
 
 // 文件夹列表
@@ -77,7 +75,6 @@ router.post('/pushPaper', function (req, res) {
 
   folderModel.findByIdAndUpdate(req.body._id, { $push: { folderHasPaper: req.body.folderHasPaper } }, { new: true })
     .then((data) => {
-
 
       // 更新文章属性
       data.folderHasPaper.forEach((item) => {

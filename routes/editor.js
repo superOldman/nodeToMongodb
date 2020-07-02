@@ -1,16 +1,16 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 // 文件上传
-var multiparty = require('multiparty');
-var formidable = require('formidable');
+const multiparty = require('multiparty');
+const formidable = require('formidable');
 
-var beforeIp = process.env.NODE_ENV === 'production' ? 'http://47.96.2.170:3000/' : 'http://localhost:3000/';
-var URL = require('url'); //引入URL中间件，获取req中的参数需要
+const beforeIp = process.env.NODE_ENV === 'production' ? 'http://47.96.2.170:3000/' : 'http://localhost:3000/';
+
 // html对象
-let htmlModel = require('../models/htmlModel');
-let folderModel = require('../models/folderModel');
-let tagModel = require('../models/tagModel');
-let topModel = require('../models/topModel');
+const htmlModel = require('../models/htmlModel');
+const folderModel = require('../models/folderModel');
+const tagModel = require('../models/tagModel');
+const topModel = require('../models/topModel');
 
 
 /* GET editor listing. */
@@ -20,38 +20,30 @@ router.get('/', function (req, res, next) {
 
 //保存文章
 router.post('/saveHtml', function (req, res) {
+  const { title, info, content, markdown, author, saveImageUrl, hasTags, hasFolder } = req.body;
 
   htmlModel.instert({
-    title: req.body.title,
-    info: req.body.info,
-    content: req.body.content,
-    markdown: req.body.markdown,
-    author: req.body.author,
-    saveImageUrl: req.body.saveImageUrl.startsWith('http') ? req.body.saveImageUrl : beforeIp + req.body.saveImageUrl,
-    hasTags: req.body.hasTags,
-    hasFolder: req.body.hasFolder
+    title, info, content, markdown, author,
+    saveImageUrl: saveImageUrl.startsWith('http') ? saveImageUrl : beforeIp + saveImageUrl,
+    hasTags,
+    hasFolder
+  }).then(function (data) {
+    // 添加到文件夹列表
+    if (data.hasFolder) {
+      //* folderHasPaper：[{
+      //*    _id: 文章id,
+      //*    title: 文章标题
+      //*  }]
+      folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then()
+    }
+
+    if (data.hasTags.length) {
+      data.hasTags.forEach((item) => {
+        tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then()
+      })
+    }
   })
-    .then(function (data) {
-
-
-      // 添加到文件夹列表
-      if (data.hasFolder) {
-        //* folderHasPaper：[{
-        //*    _id: 文章id,
-        //*    title: 文章标题
-        //*  }]
-        folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then()
-      }
-
-      if (data.hasTags.length) {
-        // var insertArr = [];
-        data.hasTags.forEach((item) => {
-          // insertArr.push({ name: item })
-          tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then()
-        })
-
-      }
-    }).then(() => {
+    .then(() => {
       //保存数据
       res.send({
         code: 0,
@@ -63,24 +55,9 @@ router.post('/saveHtml', function (req, res) {
 
 //保存编辑过的文章
 router.post('/saveEditorHtml', async function (req, res) {
-  // let seachId = '';
-  // let editDoc = {};
-  // for (let item in req.body) {
-  //   if (item === '_id') {
-  //     seachId = req.body[item]
-  //   } else {
-  //     editDoc[item] = req.body[item];
-  //   }
-  // }
-  const { _id, ...editDoc } = req.body;
-  // editDoc.hasTags
-  // editDoc.hasFolder
-  console.log(_id)
-  console.log(editDoc)
-  const result = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1 })
-  console.log(result)
-  const { hasFolder, hasTags } = result;
 
+  const { _id, ...editDoc } = req.body;
+  const { hasFolder, hasTags } = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1 })
 
   // 查看是否修改了标签
   let clearup = {};
@@ -104,9 +81,8 @@ router.post('/saveEditorHtml', async function (req, res) {
   // 查看是否修改了文件夹
 
   if (hasFolder !== editDoc.hasFolder) {
-    folderModel.findOneAndUpdate({ folderName: hasFolder }, { $pull: { folderHasPaper: { _id: _id } } }).then();
-    folderModel.findOneAndUpdate({ folderName: editDoc.hasFolder }, { $push: { folderHasPaper: { _id: _id, title: editDoc.title } } }).then();
-
+    folderModel.findOneAndUpdate({ folderName: hasFolder }, { $pull: { folderHasPaper: { _id } } }).then();
+    folderModel.findOneAndUpdate({ folderName: editDoc.hasFolder }, { $push: { folderHasPaper: { _id, title: editDoc.title } } }).then();
   }
 
   await htmlModel.findByIdAndUpdate(_id, editDoc)
@@ -199,23 +175,18 @@ router.post('/setTop', async function (req, res) {
     const result = await topModel.find().lean();
     if (result.length < 2) {
 
+      const { _id, title, info, saveImageUrl }  = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
 
-      const data = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
-
-      var { _id, title, info, saveImageUrl } = data;
-
-      let update = {
+      const update = {
         _id, title, info, cover: saveImageUrl
       }
 
       const doc = await topModel.findByIdAndUpdate(_id, update, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
 
-
       res.send({
         code: 0,
         success: doc,
       })
-
 
     } else {
       res.send({
@@ -230,8 +201,6 @@ router.post('/setTop', async function (req, res) {
       code: 0,
       success: data,
     })
-
-
   }
 
 

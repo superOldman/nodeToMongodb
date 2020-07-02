@@ -2,7 +2,7 @@ const mongoose = require('../db.js');
 
 class UserModel {
   constructor() {
-    var userSchema = new mongoose.Schema({
+    const userSchema = new mongoose.Schema({
       email: {
         type: String,
         required: true
@@ -18,12 +18,12 @@ class UserModel {
       updated_at: {
         type: Date,
         default: new Date()
-      },     
+      },
       photo: {
         type: String,
         required: false
       },
-      
+
       lastLogin: {
         type: Array,
         default: []
@@ -35,9 +35,7 @@ class UserModel {
 
   // 注册用户
   instert(data) {
-    console.log(data);
-    let user = this.userModel(data);
-    return user.save();
+    return this.userModel(data).save();
   }
   // 查找
   findOne(data, options) {
@@ -47,15 +45,11 @@ class UserModel {
   findOneAndUpdate(conditions, doc, options, callback) {
     return this.userModel.findOneAndUpdate(conditions, doc, options)
   }
-  
+
   findOneAndDelete(conditions, options) {
     return this.userModel.findOneAndDelete(conditions, options)
   }
-  async singup(req, res, next) {
-    res.header('Access-Control-Allow-Headers');
 
-    res.set('Content-Type');
-  }
 }
 
 

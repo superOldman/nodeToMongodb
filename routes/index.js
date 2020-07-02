@@ -1,18 +1,15 @@
-var express = require('express');
-var router = express.Router();
-var URL = require('url'); //引入URL中间件，获取req中的参数需要
+const express = require('express');
+const router = express.Router();
 // html对象
-let htmlModel = require('../models/htmlModel');
-let folderModel = require('../models/folderModel');
-let tagModel = require('../models/tagModel');
-let topModel = require('../models/topModel');
-let userModel = require('../models/userModel');
+const htmlModel = require('../models/htmlModel');
+const folderModel = require('../models/folderModel');
+const tagModel = require('../models/tagModel');
+const topModel = require('../models/topModel');
+const userModel = require('../models/userModel');
 
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-
-  console.log('空')
   res.render('index', { title: 'Express' });
 });
 

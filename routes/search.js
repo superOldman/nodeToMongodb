@@ -1,11 +1,11 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-let htmlModel = require('../models/htmlModel');//引入模型
+const htmlModel = require('../models/htmlModel');//引入模型
 
 
 router.post('/getTitleList', function (req, res) {
-  let search = {};
+  const search = {};
   if (req.body.length) {
     search.title = req.body.title;
   }
@@ -13,7 +13,7 @@ router.post('/getTitleList', function (req, res) {
   console.log(search)
   htmlModel.find(search).then(function (result, reject) {
 
-    let arr = [];
+    const arr = [];
     result.forEach((item) => {
       arr.push({ value: item.title, id: item._id })
     })

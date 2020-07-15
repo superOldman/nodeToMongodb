@@ -23,6 +23,10 @@ class UserModel {
         type: String,
         required: false
       },
+      motto: {
+        type: String,
+        required: false
+      },
 
       lastLogin: {
         type: Array,

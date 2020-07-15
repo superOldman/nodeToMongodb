@@ -50,7 +50,7 @@ app.use(
     secret: 'skmtest',
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 }
+    cookie: { maxAge: 1000 * 60 * 60 * 12 }
   })
 );
 
@@ -100,21 +100,32 @@ app.all('*', function (req, res, next) {
  *  session 拦截
  */
 app.all('*', function (req, res, next) {
-  if (req.url.includes('/users/logout') || req.url.includes('/editor')) {
-    req.session.username = 'superOldMan';
-    let username = req.session.username;
+  const passInterFace = [
+    'login',
+    'searchById',
+    'list',
+    'folderAndTagList',
+    'topList',
+    'folderOrTagList'
+  ]
+  let url = req.originalUrl;
+  let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, "").split('/')[0];
 
+
+  if (req.url.includes('login')) {
+    next();
+  } else {
+    let username = req.session.username;
     console.log('拦截登录：', username)
     if (username) {
       next();
     } else {
-      res.send({
+      res.status(403).send({
         code: 1,
-        message: '用户未登陆！'
+        message: '请登录！'
       });
+
     }
-  } else {
-    next();
   }
 });
 
@@ -212,6 +223,7 @@ app.use(function (err, req, res, next) {
 
 
 let testMod = require('./models/testMod.js');
+const { EWOULDBLOCK } = require('constants');
 
 // console.log(testMod.testModel)
 

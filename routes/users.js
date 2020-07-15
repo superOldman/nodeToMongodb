@@ -8,6 +8,9 @@ let htmlModel = require('../models/htmlModel');
 // 加密
 let bcrypt = require('bcryptjs');
 
+const formidable = require('formidable');
+
+const beforeIp = process.env.NODE_ENV === 'production' ? 'http://47.96.2.170:3000/' : 'http://localhost:3000/';
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -19,7 +22,6 @@ router.post('/login', async function (req, res) {
   let username = req.body.username;
   let password = req.body.password;
 
-
   const result = await userModel.findOneAndUpdate({ username }, { $push: { lastLogin: new Date() } })
 
   bcrypt.compare(password, result.password, async function (err, passwordisTure) {
@@ -27,78 +29,29 @@ router.post('/login', async function (req, res) {
       console.log('err', err)
     }
 
-
     let dataJson = {}
     if (passwordisTure) {
       const len = result.lastLogin.length;
       const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
       if (len >= 10) {
-        await userModel.findOneAndUpdate({ username }, { $shift: { lastLogin: 1 } })
+        await userModel.findOneAndUpdate({ username }, { $pop: { lastLogin: -1 } })
 
       }
       req.session.username = username;
       dataJson.code = 0;
       dataJson.message = '登录成功';
       dataJson.lastLogin = lastLogin
-      // dataJson.userMessage = {
-      //   title:'管理员',
-      //   userName:req.session.username,
-      //   imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      // }
+
     } else {
       dataJson.code = 1;
       dataJson.message = '登录失败,密码错误！';
     }
     res.send(dataJson);
-
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // userModel.findOne({ username })
-  //   .exec(function (err, data) {
-
-
-  //     bcrypt.compare(password, data.password, function (err, passwordisTure) {
-  //       if(err){
-  //         console.log('err',err)
-  //       }
-
-
-  //       let dataJson = {}
-  //       if (passwordisTure) {
-  //         req.session.username = username;
-  //         dataJson.code = 0;
-  //         dataJson.message = '登录成功';
-  //         dataJson.lastLogin = data.lastLogin
-  //         // dataJson.userMessage = {
-  //         //   title:'管理员',
-  //         //   userName:req.session.username,
-  //         //   imgUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-  //         // }
-  //       } else {
-  //         dataJson.code = 1;
-  //         dataJson.message = '登录失败';
-  //       }
-  //       res.send(dataJson);
-
-  //     });
-  //   })
 });
 
-router.post('/getUserInfo', async function (req, res) { 
-  htmlModel.find({ username: req.body.username }, { hasFolder: 1}).then((data) => {
+router.post('/getUserInfo', async function (req, res) {
+  htmlModel.find({ username: req.body.username }, { hasFolder: 1 }).then((data) => {
     res.send(data);
   })
 })
@@ -218,8 +171,60 @@ router.post('/userUpdate', async function (req, res) {
 });
 
 
+// 上传头像
+router.post('/uploadUserPhoto', function (req, res) {
 
+  try {
+    const form = formidable({
+      multiples: true,
+      keepExtensions: true,
+      uploadDir: './public/images',
+    });
 
+    form.parse(req, async (err, fields, files) => {
+      if (err) {
+        console.log('err', err);
+      }
+      if (files) {
+
+        await userModel.findOneAndUpdate({ username: req.session.username }, { photo: beforeIp + files.file.path }, { upsert: true });
+
+        res.send({
+          success: 1, // 0 表示上传失败，1 表示上传成功
+          message: '上传成功。',
+          ...files // 文件信息
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error)
+  }
+
+})
+
+// 上传签名
+router.post('/uploadUserMotto', async function (req, res) {
+  try {
+    const username = req.session.username;
+    const { motto } = req.body;
+    if (motto) {
+      await userModel.findOneAndUpdate({ username }, { motto }, { upsert: true });
+      res.send({
+        code: 0,
+        message: '更新签名成功',
+      });
+
+    } else {
+      res.send({
+        code: 1, 
+        message: '更新签名失败',
+      });
+    }
+  } catch (error) {
+    console.log(error)
+  }
+
+})
 
 
 // 注销账号

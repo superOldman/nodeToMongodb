@@ -168,19 +168,17 @@ router.post('/destroy', async function (req, res) { // 接收 _id
 // 置顶
 router.post('/setTop', async function (req, res) {
 
-  var { _id, stick } = req.body;
+  const { _id, stick } = req.body;
   console.log(stick)
 
   if (stick) {
     const result = await topModel.find().lean();
+    console.log('setTopresult',result)
     if (result.length < 2) {
-
-      const { _id, title, info, saveImageUrl }  = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
-
+      const { _id: id, title, info, saveImageUrl }  = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
       const update = {
-        _id, title, info, cover: saveImageUrl
+        _id: id, title, info, cover: saveImageUrl
       }
-
       const doc = await topModel.findByIdAndUpdate(_id, update, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
 
       res.send({

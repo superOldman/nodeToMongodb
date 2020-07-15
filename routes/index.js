@@ -17,12 +17,12 @@ router.get('/', function (req, res, next) {
 
 // 判断登陆
 router.get('/islogin', async function (req, res, next) {
-  if (!req.session.username) {
-    res.status(403).send({
-      code: 1,
-      message: '请登录！'
-    });
-  } else {
+  // if (!req.session.username) {
+  //   res.status(403).send({
+  //     code: 1,
+  //     message: '请登录！'
+  //   });
+  // } else {
     const result = await userModel.findOne({username: req.session.username}, { password: 0});
     console.log('islogin.result',result)
     const len = result.lastLogin.length;
@@ -37,14 +37,16 @@ router.get('/islogin', async function (req, res, next) {
         userName: result.username,
         lastLogin: lastLogin,
         photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+        motto: result.motto
       }
     });
-  }
+  // }
 });
 
 
 // 查寻列表
 router.get('/list', function (req, res, next) {
+  // console.log(req)
   let findData = {};
   let projection = { markdown: 0, content: 0 }
   let options = { sort: { updated_at: -1 } }

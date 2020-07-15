@@ -40,7 +40,7 @@
           <button type="button" class="btn btn-info" onclick="login()">登陆</button>
           <button type="button" class="btn btn-info" onclick="searchItem()">查询</button>
         </div>
-              <!--显示数据库信息-->
+        <!--显示数据库信息-->
         <div class="content" onclick="editItem()" style="margin-top: 10px;"></div>
 
       </div>
@@ -62,7 +62,7 @@
       $.post('http://localhost:3000/login',obj, function(res) {
         // debugger
         console.log(res)
-          // $('.content').append(res);
+        // $('.content').append(res);
         
       });
       // $.post('http://localhost:5000/users/login',obj,function(res){

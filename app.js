@@ -73,7 +73,7 @@ app.all('*', function (req, res, next) {
   ];
 
 
-  console.log('拦截跨域')
+  console.log('拦截跨域');
   console.log(req.headers.origin)
   if (orginList.includes(req.headers.origin.toLowerCase())) {
     //设置允许跨域的域名，*代表允许任意域名跨域
@@ -100,21 +100,18 @@ app.all('*', function (req, res, next) {
  *  session 拦截
  */
 app.all('*', function (req, res, next) {
-  const passInterFace = [
-    'login',
-    'searchById',
-    'list',
-    'folderAndTagList',
-    'topList',
-    'folderOrTagList'
+
+  // 需拦截
+  const InterFace = [
+    'users',
+    'editor',
+    'folder',
+    'statsHome',
   ]
   let url = req.originalUrl;
-  let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, "").split('/')[0];
+  let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, "").split('/');
 
-
-  if (req.url.includes('login')) {
-    next();
-  } else {
+  if (InterFace.includes(interFaceFirst[1]) && interFaceFirst[2] !== 'login') {
     let username = req.session.username;
     console.log('拦截登录：', username)
     if (username) {
@@ -124,8 +121,9 @@ app.all('*', function (req, res, next) {
         code: 1,
         message: '请登录！'
       });
-
     }
+  } else {
+    next();
   }
 });
 

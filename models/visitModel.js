@@ -14,7 +14,7 @@ class VisitModel {
       },
       updated_at: {
         type: Date,
-        default: myGetTime(),
+        default: myGetTime,
       }
     });
 

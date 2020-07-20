@@ -10,7 +10,7 @@ class TagModel {
       },
       updated_at: {
         type: Date,
-        default: new Date()
+        default: Date.now
       }
     });
 

@@ -23,9 +23,15 @@ class HtmlModel {
         type: String,
         required: true
       },
+      // 封面
       saveImageUrl: {
         type: String,
         required: false
+      },
+      // 文章使用的图片
+      paperUseImg: {
+        type: Array,
+        default: []
       },
       hasTags: {
         type: Array,

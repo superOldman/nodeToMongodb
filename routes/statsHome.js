@@ -5,28 +5,49 @@ const path = require('path');
 const mongoose = require('../db.js')
 const visitModel = require('../models/visitModel.js');
 const htmlModel = require('../models/htmlModel.js');
+const imageModel = require('../models/imageModel.js');
+
+const { beforeIp, kbOrmb, backslashReplace } = require('../utils/utils');
+// 图片格式
+// bmp, jpg, png, tif, gif, pcx, tga, exif, fpx, svg, psd, cdr, pcd, dxf, ufo, eps, ai, raw, WMF, webp
+const imgFormat = ['jpg', 'jpeg', 'svg', 'webp', 'png', 'gif'];
+
+
+// 统计文件函数
+
 
 function countFileSize(src) {
     return new Promise(function (result, reject) {
         fs.readdir(src, function (err, file) {
             let n = 0;
-            file.forEach((e, index) => {
+            console.log('文件', file)
+            console.log('路径', src)
+            file.forEach( async (e, index) => {
                 //遍历之后递归调用查看文件函数
                 //遍历目录得到的文件名称是不含路径的，需要将前面的绝对路径拼接
-                let absolutePath = path.resolve(path.join(src, e));
-
+                let absolutePath = backslashReplace(path.resolve(path.join(src, e)));
                 const stats = fs.statSync(absolutePath);
-                n += stats.size;
+                console.log(absolutePath)
+                
+                // 如果是图片加到图片表里去、
+                if (imgFormat.includes(e.split('.')[1])) {
+                    const url = `${beforeIp}${src}/${e}`;
+                    const result = await imageModel.findOne({ url });
+                    if( !result ) {
+                        imageModel.instert({ url, size: kbOrmb(stats.size) }).then();
+                    }
+                }
 
+                n += stats.size;
                 if (index === file.length - 1) {
-                    result({ count: file.length, size: (n / 1024 / 1024).toFixed(2) + 'mb' })
+                    result({ count: file.length, size: n })
                 }
             })
         })
     })
 }
 
-
+// 查总表
 function getCollections() {
     let collections = []
     for (let key in mongoose.connection.collections) {
@@ -73,13 +94,13 @@ function addZero(num) {
     return num >= 10 ? num : `0${num}`
 }
 
-function kbOrmb(size) {
-    if ((size / 1024 / 1024) > 0) {
-        return (size / 1024).toFixed(2) + 'kb'
-    } else {
-        return (size / 1024 / 1024).toFixed(2) + 'mb'
-    }
-}
+// function kbOrmb(size) {
+//     if ((size / 1024 / 1024) > 0) {
+//         return (size / 1024).toFixed(2) + 'kb'
+//     } else {
+//         return (size / 1024 / 1024).toFixed(2) + 'mb'
+//     }
+// }
 
 // 访问统计接口
 router.get('/visit', async function (req, res) {
@@ -165,14 +186,18 @@ router.get('/resourceStats', async function (req, res) {
     });
 
     res.send({
-        pictureDetail,
+        pictureDetail :  {
+           count: pictureDetail.count,
+           size: (pictureDetail.size / 1024 / 1024).toFixed(2) + 'mb'
+        },
         baseDataSize: kbOrmb(tj),
         paperDetail,
+        allSize: pictureDetail.size + tj
     })
 
 })
 
-// 图片存储量
+// 统计文章
 router.get('/lastYearPushPaperCount', async function (req, res) {
     const result = await htmlModel.find({}, { updated_at: 1 }).sort({ updated_at: 1 });
     let pushPaperDate = [];

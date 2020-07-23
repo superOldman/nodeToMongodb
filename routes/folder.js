@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const folderModel = require('../models/folderModel');//引入模型
-const htmlModel = require('../models/htmlModel');//引入模型
+const htmlModel = require('../models/htmlModel');
+const imageModel = require('../models/imageModel');
 
 
 // 文件夹列表
@@ -26,6 +27,12 @@ router.get('/getFolderList', function (req, res) {
  *
  */
 router.post('/saveFolder', function (req, res) {
+  console.log('zoou',req.body)
+
+  const { cover, folderName } = req.body;
+  if (cover) {
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹${folderName}封面` } }).then();
+  }
   folderModel.instert(req.body).then(function (data) {
     res.send({
       code: 0,
@@ -47,15 +54,18 @@ router.post('/saveFolder', function (req, res) {
  * }
  *
  */
-router.post('/saveEditorFolder', function (req, res) {
-  folderModel.findByIdAndUpdate(req.body._id, req.body, { new: true })
-    .then((data) => {
-      res.send({
-        code: 0,
-        message: '保存成功！',
-        data
-      })
-    });
+router.post('/saveEditorFolder', async function (req, res) {
+
+  const { cover, folderName } = req.body;
+  if (cover) {
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹${folderName}封面` } }).then();
+  }
+  const data = await folderModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
+  res.send({
+    code: 0,
+    message: '保存成功！',
+    data
+  });
 });
 
 
@@ -69,7 +79,6 @@ router.post('/saveEditorFolder', function (req, res) {
  *    title: 文章标题
  *  }]
  * }
- * 
  */
 router.post('/pushPaper', function (req, res) {
 

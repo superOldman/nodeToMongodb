@@ -4,13 +4,18 @@ const router = express.Router();
 const multiparty = require('multiparty');
 const formidable = require('formidable');
 
-const beforeIp = process.env.NODE_ENV === 'production' ? 'http://47.96.2.170:3000/' : 'http://localhost:3000/';
 
 // html对象
 const htmlModel = require('../models/htmlModel');
 const folderModel = require('../models/folderModel');
 const tagModel = require('../models/tagModel');
 const topModel = require('../models/topModel');
+const imageModel = require('../models/imageModel');
+
+
+// utils
+const { beforeIp, kbOrmb, backslashReplace } = require('../utils/utils');
+
 
 
 /* GET editor listing. */
@@ -20,11 +25,14 @@ router.get('/', function (req, res, next) {
 
 //保存文章
 router.post('/saveHtml', function (req, res) {
-  const { title, info, content, markdown, author, saveImageUrl, hasTags, hasFolder } = req.body;
-
+  const { title, info, content, markdown, author, saveImageUrl, paperUseImg, hasTags, hasFolder } = req.body;
+  let cover = '';
+  if (saveImageUrl) {
+    cover = saveImageUrl.startsWith('http') ? saveImageUrl : beforeIp + saveImageUrl
+  }
   htmlModel.instert({
-    title, info, content, markdown, author,
-    saveImageUrl: saveImageUrl.startsWith('http') ? saveImageUrl : beforeIp + saveImageUrl,
+    title, info, content, markdown, author, paperUseImg,
+    saveImageUrl: cover,
     hasTags,
     hasFolder
   }).then(function (data) {
@@ -36,12 +44,23 @@ router.post('/saveHtml', function (req, res) {
       //*  }]
       folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then()
     }
-
+    // 添加到标签列表
     if (data.hasTags.length) {
       data.hasTags.forEach((item) => {
         tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then()
       })
     }
+
+    // 添加到图片列表
+    if (cover) {
+      imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `《${title}》封面` } }, { upsert: true, setDefaultsOnInsert: true }).then();
+    }
+    if (paperUseImg.length) {
+      paperUseImg.forEach((url) => {
+        imageModel.findOneAndUpdate({ url }, { $push: { connection: `《${title}》引用` } }, { upsert: true, setDefaultsOnInsert: true }).then();
+      })
+    }
+
   })
     .then(() => {
       //保存数据
@@ -57,7 +76,9 @@ router.post('/saveHtml', function (req, res) {
 router.post('/saveEditorHtml', async function (req, res) {
 
   const { _id, ...editDoc } = req.body;
-  const { hasFolder, hasTags } = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1 })
+  const {
+    hasFolder, hasTags, paperUseImg, saveImageUrl, title
+  } = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1, paperUseImg: 1, saveImageUrl: 1, title: 1 })
 
   // 查看是否修改了标签
   let clearup = {};
@@ -67,8 +88,8 @@ router.post('/saveEditorHtml', async function (req, res) {
         delete clearup[item]
         break
       }
-      clearup[item] = true;
     }
+    clearup[item] = true;
   })
 
   const clearupArr = Object.keys(clearup);
@@ -79,10 +100,41 @@ router.post('/saveEditorHtml', async function (req, res) {
   }
 
   // 查看是否修改了文件夹
-
   if (hasFolder !== editDoc.hasFolder) {
     folderModel.findOneAndUpdate({ folderName: hasFolder }, { $pull: { folderHasPaper: { _id } } }).then();
     folderModel.findOneAndUpdate({ folderName: editDoc.hasFolder }, { $push: { folderHasPaper: { _id, title: editDoc.title } } }).then();
+  }
+
+  // 查看是否修改了图片
+  let clearup_img = {};
+  editDoc.paperUseImg.forEach(item => {
+    for (let i = 0; i < paperUseImg.length; i++) {
+      if (item === paperUseImg[i]) {
+        delete clearup_img[item]
+        break
+      }
+    }
+    clearup_img[item] = true;
+
+  })
+
+  const clearupImgArr = Object.keys(clearup_img);
+  // 封面
+  if (editDoc.saveImageUrl !== saveImageUrl) {
+    imageModel.findOneAndUpdate({ url: editDoc.saveImageUrl }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
+    imageModel.findOneAndUpdate({ url: saveImageUrl }, { $pull: { connection: `《${title}》封面` } }).then();
+  }
+
+  const {connection} = await imageModel.findOne({ url: editDoc.saveImageUrl })
+  if (!connection.length) {
+    imageModel.findOneAndUpdate({ url: editDoc.saveImageUrl }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
+  }
+
+
+  if (clearupImgArr.length) {
+    clearupImgArr.forEach(url => {
+      imageModel.findOneAndUpdate({ url }, { $push: { connection: `《${editDoc.title}》引用` } }).then();
+    })
   }
 
   await htmlModel.findByIdAndUpdate(_id, editDoc)
@@ -125,15 +177,22 @@ router.post('/uploadImg', function (req, res) {
     uploadDir: './public/images',
   });
 
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     if (err) {
       console.log('err', err);
     }
-    if (files) {
+    if (files) {  
+      const file = Object.keys(files)[0];
+
+      const path = backslashReplace(files[file].path);
+      const result = await imageModel.instert({ url: beforeIp + path, size: kbOrmb(files[file].size) });
       res.send({
         success: 1, // 0 表示上传失败，1 表示上传成功
         message: '上传成功。',
-        ...files // 文件信息
+        //...files // 文件信息
+        file: {
+          path
+        }
       });
     }
   });
@@ -173,9 +232,9 @@ router.post('/setTop', async function (req, res) {
 
   if (stick) {
     const result = await topModel.find().lean();
-    console.log('setTopresult',result)
+    console.log('setTopresult', result)
     if (result.length < 2) {
-      const { _id: id, title, info, saveImageUrl }  = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
+      const { _id: id, title, info, saveImageUrl } = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
       const update = {
         _id: id, title, info, cover: saveImageUrl
       }

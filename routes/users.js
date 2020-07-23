@@ -3,14 +3,17 @@ var router = express.Router();
 
 // user对象
 let userModel = require('../models/userModel');
-let htmlModel = require('../models/htmlModel');
+const htmlModel = require('../models/htmlModel');
+const imageModel = require('../models/imageModel');
 
 // 加密
 let bcrypt = require('bcryptjs');
 
+// 图片
 const formidable = require('formidable');
 
-const beforeIp = process.env.NODE_ENV === 'production' ? 'http://47.96.2.170:3000/' : 'http://localhost:3000/';
+// utils
+const { beforeIp, kbOrmb } = require('../utils/utils');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -186,6 +189,8 @@ router.post('/uploadUserPhoto', function (req, res) {
         console.log('err', err);
       }
       if (files) {
+
+        await imageModel.instert({ url: beforeIp + files.file.path, size: kbOrmb(files.file.size), connection: [`${req.session.username}头像`] })
 
         await userModel.findOneAndUpdate({ username: req.session.username }, { photo: beforeIp + files.file.path }, { upsert: true });
 

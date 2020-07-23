@@ -15,6 +15,7 @@ var editorRouter = require('./routes/editor');
 var searchRouter = require('./routes/search');
 var folderRouter = require('./routes/folder');
 var statsHomeRouter = require('./routes/statsHome');
+var pictureRouter = require('./routes/picture');
 
 //实例化
 var app = express();
@@ -106,7 +107,8 @@ app.all('*', function (req, res, next) {
     'users',
     'editor',
     'folder',
-    'statsHome',
+    // 'statsHome',
+    // 'picture'
   ]
   let url = req.originalUrl;
   let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, "").split('/');
@@ -134,10 +136,10 @@ app.use('/users', usersRouter);
 // 后台编辑器接口
 app.use('/editor', editorRouter);
 
-
 app.use('/search', searchRouter);
 app.use('/folder', folderRouter);
 app.use('/statsHome', statsHomeRouter);
+app.use('/picture', pictureRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

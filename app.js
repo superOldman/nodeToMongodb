@@ -107,8 +107,8 @@ app.all('*', function (req, res, next) {
     'users',
     'editor',
     'folder',
-    // 'statsHome',
-    // 'picture'
+    'statsHome',
+    'picture'
   ]
   let url = req.originalUrl;
   let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, "").split('/');

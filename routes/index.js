@@ -17,12 +17,6 @@ router.get('/', function (req, res, next) {
 
 // 判断登陆
 router.get('/islogin', async function (req, res, next) {
-  // if (!req.session.username) {
-  //   res.status(403).send({
-  //     code: 1,
-  //     message: '请登录！'
-  //   });
-  // } else {
     const result = await userModel.findOne({username: req.session.username}, { password: 0});
     console.log('islogin.result',result)
     const len = result.lastLogin.length;
@@ -40,7 +34,6 @@ router.get('/islogin', async function (req, res, next) {
         motto: result.motto
       }
     });
-  // }
 });
 
 

@@ -27,14 +27,13 @@ function countFileSize(src) {
                 //遍历目录得到的文件名称是不含路径的，需要将前面的绝对路径拼接
                 let absolutePath = backslashReplace(path.resolve(path.join(src, e)));
                 const stats = fs.statSync(absolutePath);
-                console.log(absolutePath)
                 
                 // 如果是图片加到图片表里去、
                 if (imgFormat.includes(e.split('.')[1])) {
                     const url = `${beforeIp}${src}/${e}`;
                     const result = await imageModel.findOne({ url });
                     if( !result ) {
-                        imageModel.instert({ url, size: kbOrmb(stats.size) }).then();
+                        imageModel.instert({ url, size: kbOrmb(stats.size), updated_at: stats.mtime }).then();
                     }
                 }
 

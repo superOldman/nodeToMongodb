@@ -120,13 +120,15 @@ router.post('/saveEditorHtml', async function (req, res) {
 
   const clearupImgArr = Object.keys(clearup_img);
   // 封面
-  if (editDoc.saveImageUrl !== saveImageUrl) {
-    imageModel.findOneAndUpdate({ url: editDoc.saveImageUrl }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
+  const cover = editDoc.saveImageUrl.startsWith('http') ? editDoc.saveImageUrl : beforeIp + editDoc.saveImageUrl;
+
+  if (cover !== saveImageUrl) {
+    imageModel.findOneAndUpdate({ url: saveImageUrl }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
     imageModel.findOneAndUpdate({ url: saveImageUrl }, { $pull: { connection: `《${title}》封面` } }).then();
   }
 
-  const {connection} = await imageModel.findOne({ url: editDoc.saveImageUrl })
-  if (!connection.length) {
+  const imageRes = await imageModel.findOne({ url: editDoc.saveImageUrl });
+  if (imageRes && imageRes.connection && !imageRes.connection.length) {
     imageModel.findOneAndUpdate({ url: editDoc.saveImageUrl }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
   }
 
@@ -138,6 +140,8 @@ router.post('/saveEditorHtml', async function (req, res) {
   }
 
   await htmlModel.findByIdAndUpdate(_id, editDoc)
+
+  await htmlModel.findByIdAndUpdate(_id,{ ...editDoc, saveImageUrl: cover})
   res.send({ code: 0, message: '修改成功' })
 
 })
@@ -228,11 +232,9 @@ router.post('/destroy', async function (req, res) { // 接收 _id
 router.post('/setTop', async function (req, res) {
 
   const { _id, stick } = req.body;
-  console.log(stick)
 
   if (stick) {
     const result = await topModel.find().lean();
-    console.log('setTopresult', result)
     if (result.length < 2) {
       const { _id: id, title, info, saveImageUrl } = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
       const update = {

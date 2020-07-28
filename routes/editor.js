@@ -83,13 +83,13 @@ router.post('/saveEditorHtml', async function (req, res) {
   // 查看是否修改了标签
   let clearup = {};
   editDoc.hasTags.forEach(item => {
+    clearup[item] = true;
     for (let i = 0; i < hasTags.length; i++) {
       if (item === hasTags[i]) {
         delete clearup[item]
         break
       }
     }
-    clearup[item] = true;
   })
 
   const clearupArr = Object.keys(clearup);
@@ -105,43 +105,35 @@ router.post('/saveEditorHtml', async function (req, res) {
     folderModel.findOneAndUpdate({ folderName: editDoc.hasFolder }, { $push: { folderHasPaper: { _id, title: editDoc.title } } }).then();
   }
 
-  // 查看是否修改了图片
-  let clearup_img = {};
-  editDoc.paperUseImg.forEach(item => {
-    for (let i = 0; i < paperUseImg.length; i++) {
-      if (item === paperUseImg[i]) {
-        delete clearup_img[item]
-        break
-      }
-    }
-    clearup_img[item] = true;
-
+  // 查看是否修改了引用图片
+  const newUseImg = editDoc.paperUseImg.filter(item => {
+    return !paperUseImg.includes(item);
   })
-
-  const clearupImgArr = Object.keys(clearup_img);
-  // 封面
-  const cover = editDoc.saveImageUrl.startsWith('http') ? editDoc.saveImageUrl : beforeIp + editDoc.saveImageUrl;
-
-  if (cover !== saveImageUrl) {
-    imageModel.findOneAndUpdate({ url: saveImageUrl }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
-    imageModel.findOneAndUpdate({ url: saveImageUrl }, { $pull: { connection: `《${title}》封面` } }).then();
-  }
-
-  const imageRes = await imageModel.findOne({ url: editDoc.saveImageUrl });
-  if (imageRes && imageRes.connection && !imageRes.connection.length) {
-    imageModel.findOneAndUpdate({ url: editDoc.saveImageUrl }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
-  }
-
-
-  if (clearupImgArr.length) {
-    clearupImgArr.forEach(url => {
+  if (newUseImg.length) {
+    newUseImg.forEach((url) => {
       imageModel.findOneAndUpdate({ url }, { $push: { connection: `《${editDoc.title}》引用` } }).then();
     })
   }
 
-  await htmlModel.findByIdAndUpdate(_id, editDoc)
+  const oldUseImg = paperUseImg.filter(item => {
+    return !editDoc.paperUseImg.includes(item);
+  })
+  if (oldUseImg.length) {
+    oldUseImg.forEach((url) => {
+      imageModel.findOneAndUpdate({ url }, { $pull: { connection: `《${title}》引用` } }).then();
+    })
+  }
 
-  await htmlModel.findByIdAndUpdate(_id,{ ...editDoc, saveImageUrl: cover})
+
+  // 封面
+  const cover = editDoc.saveImageUrl.startsWith('http') ? editDoc.saveImageUrl : beforeIp + editDoc.saveImageUrl;
+
+  if (cover !== saveImageUrl) {
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
+    imageModel.findOneAndUpdate({ url: saveImageUrl }, { $pull: { connection: `《${title}》封面` } }).then();
+  }
+
+  await htmlModel.findByIdAndUpdate(_id, { ...editDoc, saveImageUrl: cover })
   res.send({ code: 0, message: '修改成功' })
 
 })
@@ -185,7 +177,7 @@ router.post('/uploadImg', function (req, res) {
     if (err) {
       console.log('err', err);
     }
-    if (files) {  
+    if (files) {
       const file = Object.keys(files)[0];
 
       const path = backslashReplace(files[file].path);

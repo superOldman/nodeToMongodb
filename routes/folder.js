@@ -57,9 +57,12 @@ router.post('/saveFolder', function (req, res) {
 router.post('/saveEditorFolder', async function (req, res) {
 
   const { cover, folderName } = req.body;
-  if (cover) {
-    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹${folderName}封面` } }).then();
+  const oldData = await folderModel.findById(req.body._id);
+  if (oldData && cover !== oldData.cover) {
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then(); 
+    imageModel.findOneAndUpdate({ url: oldData.cover }, { $pull: { connection: `文件夹:${oldData.folderName} 封面` } }).then();
   }
+
   const data = await folderModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
   res.send({
     code: 0,

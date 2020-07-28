@@ -18,7 +18,6 @@ router.get('/', function (req, res, next) {
 // 判断登陆
 router.get('/islogin', async function (req, res, next) {
     const result = await userModel.findOne({username: req.session.username}, { password: 0});
-    console.log('islogin.result',result)
     const len = result.lastLogin.length;
     const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
 

@@ -31,7 +31,7 @@ router.post('/saveFolder', function (req, res) {
 
   const { cover, folderName } = req.body;
   if (cover) {
-    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName}封面` } }).then();
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then();
   }
   folderModel.instert(req.body).then(function (data) {
     res.send({

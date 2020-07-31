@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const folderModel = require('../models/folderModel');//引入模型
+const folderModel = require('../models/folderModel');// 引入模型
 const htmlModel = require('../models/htmlModel');
 const imageModel = require('../models/imageModel');
 
@@ -12,9 +12,9 @@ router.get('/getFolderList', function (req, res) {
     res.send({
       code: 0,
       data
-    })
-  })
-})
+    });
+  });
+});
 
 /**
  * 新增文件夹
@@ -27,7 +27,7 @@ router.get('/getFolderList', function (req, res) {
  *
  */
 router.post('/saveFolder', function (req, res) {
-  console.log('zoou',req.body)
+  console.log('zoou', req.body);
 
   const { cover, folderName } = req.body;
   if (cover) {
@@ -38,8 +38,8 @@ router.post('/saveFolder', function (req, res) {
       code: 0,
       message: '保存成功！',
       data
-    })
-  })
+    });
+  });
 });
 
 
@@ -59,7 +59,7 @@ router.post('/saveEditorFolder', async function (req, res) {
   const { cover, folderName } = req.body;
   const oldData = await folderModel.findById(req.body._id);
   if (oldData && cover !== oldData.cover) {
-    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then(); 
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then();
     imageModel.findOneAndUpdate({ url: oldData.cover }, { $pull: { connection: `文件夹:${oldData.folderName} 封面` } }).then();
   }
 
@@ -72,7 +72,7 @@ router.post('/saveEditorFolder', async function (req, res) {
 });
 
 
-/** 
+/**
  * 向文件夹添加文章
  * @params
  * req.body = {
@@ -91,23 +91,23 @@ router.post('/pushPaper', function (req, res) {
       // 更新文章属性
       data.folderHasPaper.forEach((item) => {
 
-        htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName }).then()
-      })
-      return data
+        htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName }).then();
+      });
+      return data;
 
     }).then((data) => {
       res.send({
         code: 0,
         data: data.folderHasPaper
-      })
-    })
-})
+      });
+    });
+});
 
 
 
 /**
  * 删除文件夹
- * @params 
+ * @params
  * req.body = {
  *  _id： 文件夹id,
  * }
@@ -120,15 +120,15 @@ router.post('/deleteFolder', async function (req, res) {
 
   folderHasPaper.forEach((item) => {
     htmlModel.findByIdAndUpdate(item._id, { hasFolder: '' }).exec();
-  })
+  });
 
   const result = await folderModel.findByIdAndDelete(req.body._id);
 
-  console.log(result)
+  console.log(result);
 
-  res.send({ code: 0, message: '删除成功！' })
+  res.send({ code: 0, message: '删除成功！' });
 
-})
+});
 
 
 

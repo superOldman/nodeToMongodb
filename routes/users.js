@@ -20,30 +20,30 @@ router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
-//登录接口
+// 登录接口
 router.post('/login', async function (req, res) {
   let username = req.body.username;
   let password = req.body.password;
 
-  const result = await userModel.findOneAndUpdate({ username }, { $push: { lastLogin: new Date() } })
+  const result = await userModel.findOneAndUpdate({ username }, { $push: { lastLogin: new Date() } });
 
   bcrypt.compare(password, result.password, async function (err, passwordisTure) {
     if (err) {
-      console.log('err', err)
+      console.log('err', err);
     }
 
-    let dataJson = {}
+    let dataJson = {};
     if (passwordisTure) {
       const len = result.lastLogin.length;
       const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
       if (len >= 10) {
-        await userModel.findOneAndUpdate({ username }, { $pop: { lastLogin: -1 } })
+        await userModel.findOneAndUpdate({ username }, { $pop: { lastLogin: -1 } });
 
       }
       req.session.username = username;
       dataJson.code = 0;
       dataJson.message = '登录成功';
-      dataJson.lastLogin = lastLogin
+      dataJson.lastLogin = lastLogin;
 
     } else {
       dataJson.code = 1;
@@ -56,8 +56,8 @@ router.post('/login', async function (req, res) {
 router.post('/getUserInfo', async function (req, res) {
   htmlModel.find({ username: req.body.username }, { hasFolder: 1 }).then((data) => {
     res.send(data);
-  })
-})
+  });
+});
 
 
 
@@ -69,15 +69,15 @@ router.post('/register', function (req, res, next) {
       userModel.instert({
         username: req.body.username,
         email: req.body.email,
-        password: hash,
+        password: hash
       }).then(function (data) {
         res.send({
           code: 0,
           message: '注册成功'
-        })
-      })
-    })
-  })
+        });
+      });
+    });
+  });
 });
 
 // 退出登录
@@ -93,8 +93,8 @@ router.get('/logout', function (req, res) {
 
 // 更新
 router.post('/userUpdate', async function (req, res) {
-  console.log('req.session.username', req.session.username)
-  console.log('req.body', req.body.username)
+  console.log('req.session.username', req.session.username);
+  console.log('req.body', req.body.username);
 
 
   let { username, photo, userMessage } = req.body;
@@ -104,28 +104,28 @@ router.post('/userUpdate', async function (req, res) {
       await userModel.findOneAndUpdate({ username: req.session.username }, { photo });
 
     }
-    console.log('userUpdate.req', req.body)
-    console.log('before:userMessage', userMessage)
+    console.log('userUpdate.req', req.body);
+    console.log('before:userMessage', userMessage);
     if (userMessage) {
 
-      console.log('userMessage', userMessage)
+      console.log('userMessage', userMessage);
       const result = await userModel.findOne({ username: req.session.username }, { password: 1 });
-      console.log('result', result)
+      console.log('result', result);
 
       // 验证
       bcrypt.compare(userMessage.oldPass, result.password, function (err, passwordisTure) {
         if (err) {
-          console.log('err', err)
+          console.log('err', err);
         }
 
-        console.log('passwordisTure', passwordisTure)
+        console.log('passwordisTure', passwordisTure);
         if (passwordisTure) {
 
           bcrypt.genSalt(10, function (err, salt) {
             bcrypt.hash(req.body.userMessage.newPass, salt, function (err, hash) {
               userModel.findOneAndUpdate({ username: req.session.username }, { password: hash }).then((data) => {
                 if (data) {
-                  console.log('data', data)
+                  console.log('data', data);
                   // res.status(401).send({
                   req.session.username = null;
                   res.send({
@@ -133,19 +133,19 @@ router.post('/userUpdate', async function (req, res) {
                     message: '修改成功，请重新登陆！'
                   });
                 } else {
-                  res.send(data)
+                  res.send(data);
                 }
 
-              })
+              });
 
-            })
-          })
+            });
+          });
 
         } else {
           res.send({
             code: 1,
             message: '旧密码不正确！'
-          })
+          });
         }
       });
 
@@ -155,7 +155,7 @@ router.post('/userUpdate', async function (req, res) {
       res.send({
         code: 0,
         message: '修改成功！'
-      })
+      });
     }
   } else {
     // req.session.username = null;
@@ -167,7 +167,7 @@ router.post('/userUpdate', async function (req, res) {
       code: 1,
       message: '用户名错误',
       data: req.body
-    })
+    });
   }
 
 
@@ -181,7 +181,7 @@ router.post('/uploadUserPhoto', function (req, res) {
     const form = formidable({
       multiples: true,
       keepExtensions: true,
-      uploadDir: './public/images',
+      uploadDir: './public/images'
     });
 
     form.parse(req, async (err, fields, files) => {
@@ -190,7 +190,7 @@ router.post('/uploadUserPhoto', function (req, res) {
       }
       if (files) {
 
-        await imageModel.instert({ url: beforeIp + files.file.path, size: kbOrmb(files.file.size), connection: [`${req.session.username}头像`] })
+        await imageModel.instert({ url: beforeIp + files.file.path, size: kbOrmb(files.file.size), connection: [`${req.session.username}头像`] });
 
         await userModel.findOneAndUpdate({ username: req.session.username }, { photo: beforeIp + files.file.path }, { upsert: true });
 
@@ -202,10 +202,10 @@ router.post('/uploadUserPhoto', function (req, res) {
       }
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 
-})
+});
 
 // 上传签名
 router.post('/uploadUserMotto', async function (req, res) {
@@ -216,20 +216,20 @@ router.post('/uploadUserMotto', async function (req, res) {
       await userModel.findOneAndUpdate({ username }, { motto }, { upsert: true });
       res.send({
         code: 0,
-        message: '更新签名成功',
+        message: '更新签名成功'
       });
 
     } else {
       res.send({
-        code: 1, 
-        message: '更新签名失败',
+        code: 1,
+        message: '更新签名失败'
       });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 
-})
+});
 
 
 // 注销账号

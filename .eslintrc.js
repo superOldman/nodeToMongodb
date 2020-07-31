@@ -2,11 +2,10 @@ module.exports = {
   // 此项是用来告诉eslint找当前配置文件不能往父级查找
   root: true,
   // 解析器  https://eslint.vuejs.org/user-guide/#usage
-  // parser: 'vue-eslint-parser',
-  // parserOptions: {
-  //     'parser': 'babel-eslint',
-  //     'sourceType': 'module'
-  // },
+  parserOptions: {
+    'ecmaVersion': 2020,
+    'sourceType': 'module'
+  },
   // 指定环境
   env: {
     node: true,
@@ -17,11 +16,12 @@ module.exports = {
     'eslint:recommended' // 设置此项会开启所有eslint推荐的规则 详见 http://eslint.cn/docs/rules/
   ],
   // 插件 检测 .vue 文件
-  // plugins: [
-  //     // 'html'
-  //     'vue'
-  // ],
-
+  plugins: [
+    //   "import",
+    'node'
+    //   "promise",
+    //   "standard"
+  ],
   /**
     * "off"或者0    关闭规则关闭
     * "warn"或者1    在打开的规则作为警告（不影响退出代码）

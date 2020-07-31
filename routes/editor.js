@@ -23,12 +23,12 @@ router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
-//保存文章
+// 保存文章
 router.post('/saveHtml', function (req, res) {
   const { title, info, content, markdown, author, saveImageUrl, paperUseImg, hasTags, hasFolder } = req.body;
   let cover = '';
   if (saveImageUrl) {
-    cover = saveImageUrl.startsWith('http') ? saveImageUrl : beforeIp + saveImageUrl
+    cover = saveImageUrl.startsWith('http') ? saveImageUrl : beforeIp + saveImageUrl;
   }
   htmlModel.instert({
     title, info, content, markdown, author, paperUseImg,
@@ -42,13 +42,13 @@ router.post('/saveHtml', function (req, res) {
       //*    _id: 文章id,
       //*    title: 文章标题
       //*  }]
-      folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then()
+      folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then();
     }
     // 添加到标签列表
     if (data.hasTags.length) {
       data.hasTags.forEach((item) => {
-        tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then()
-      })
+        tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then();
+      });
     }
 
     // 添加到图片列表
@@ -58,27 +58,27 @@ router.post('/saveHtml', function (req, res) {
     if (paperUseImg.length) {
       paperUseImg.forEach((url) => {
         imageModel.findOneAndUpdate({ url }, { $push: { connection: `《${title}》引用` } }, { upsert: true, setDefaultsOnInsert: true }).then();
-      })
+      });
     }
 
   })
     .then(() => {
-      //保存数据
+      // 保存数据
       res.send({
         code: 0,
         message: '保存成功'
       });
-    })
+    });
 });
 
 
-//保存编辑过的文章
+// 保存编辑过的文章
 router.post('/saveEditorHtml', async function (req, res) {
 
   const { _id, ...editDoc } = req.body;
   const {
     hasFolder, hasTags, paperUseImg, saveImageUrl, title
-  } = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1, paperUseImg: 1, saveImageUrl: 1, title: 1 })
+  } = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1, paperUseImg: 1, saveImageUrl: 1, title: 1 });
 
   // 查看是否修改了标签
   let clearup = {};
@@ -86,17 +86,17 @@ router.post('/saveEditorHtml', async function (req, res) {
     clearup[item] = true;
     for (let i = 0; i < hasTags.length; i++) {
       if (item === hasTags[i]) {
-        delete clearup[item]
-        break
+        delete clearup[item];
+        break;
       }
     }
-  })
+  });
 
   const clearupArr = Object.keys(clearup);
   if (clearupArr.length) {
     clearupArr.forEach(item => {
-      tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then()
-    })
+      tagModel.update({ name: item }, { name: item }, { upsert: true, setDefaultsOnInsert: true }).then();
+    });
   }
 
   // 查看是否修改了文件夹
@@ -108,20 +108,20 @@ router.post('/saveEditorHtml', async function (req, res) {
   // 查看是否修改了引用图片
   const newUseImg = editDoc.paperUseImg.filter(item => {
     return !paperUseImg.includes(item);
-  })
+  });
   if (newUseImg.length) {
     newUseImg.forEach((url) => {
       imageModel.findOneAndUpdate({ url }, { $push: { connection: `《${editDoc.title}》引用` } }).then();
-    })
+    });
   }
 
   const oldUseImg = paperUseImg.filter(item => {
     return !editDoc.paperUseImg.includes(item);
-  })
+  });
   if (oldUseImg.length) {
     oldUseImg.forEach((url) => {
       imageModel.findOneAndUpdate({ url }, { $pull: { connection: `《${title}》引用` } }).then();
-    })
+    });
   }
 
 
@@ -133,10 +133,10 @@ router.post('/saveEditorHtml', async function (req, res) {
     imageModel.findOneAndUpdate({ url: saveImageUrl }, { $pull: { connection: `《${title}》封面` } }).then();
   }
 
-  await htmlModel.findByIdAndUpdate(_id, { ...editDoc, saveImageUrl: cover })
-  res.send({ code: 0, message: '修改成功' })
+  await htmlModel.findByIdAndUpdate(_id, { ...editDoc, saveImageUrl: cover });
+  res.send({ code: 0, message: '修改成功' });
 
-})
+});
 
 
 // 上传图片 利用：multiparty
@@ -165,12 +165,12 @@ router.post('/saveEditorHtml', async function (req, res) {
 //   });
 // });
 
-// 上传图片 利用：formidable 
+// 上传图片 利用：formidable
 router.post('/uploadImg', function (req, res) {
   const form = formidable({
     multiples: true,
     keepExtensions: true,
-    uploadDir: './public/images',
+    uploadDir: './public/images'
   });
 
   form.parse(req, async (err, fields, files) => {
@@ -185,7 +185,7 @@ router.post('/uploadImg', function (req, res) {
       res.send({
         success: 1, // 0 表示上传失败，1 表示上传成功
         message: '上传成功。',
-        //...files // 文件信息
+        // ...files // 文件信息
         file: {
           path
         }
@@ -194,7 +194,7 @@ router.post('/uploadImg', function (req, res) {
   });
 });
 
-//删除文章
+// 删除文章
 router.post('/destroy', async function (req, res) { // 接收 _id
   // 删除 模型数组里某一项
   // { $pull: { resumeList: { mallId: mallId } } }
@@ -203,7 +203,7 @@ router.post('/destroy', async function (req, res) { // 接收 _id
   // { participant: { $elemMatch: { $eq: 1 } } }
 
   try {
-    // 尝试删除top列表 
+    // 尝试删除top列表
     await topModel.findByIdAndDelete(req.body._id);
 
     await folderModel.findOneAndUpdate({ folderHasPaper: { $elemMatch: { _id: req.body._id } } }, { $pull: { folderHasPaper: { _id: req.body._id } } });
@@ -212,9 +212,9 @@ router.post('/destroy', async function (req, res) { // 接收 _id
     res.send({
       code: 0,
       data: result
-    })
+    });
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 
 });
@@ -231,33 +231,33 @@ router.post('/setTop', async function (req, res) {
       const { _id: id, title, info, saveImageUrl } = await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('_id title info saveImageUrl');
       const update = {
         _id: id, title, info, cover: saveImageUrl
-      }
+      };
       const doc = await topModel.findByIdAndUpdate(_id, update, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
 
       res.send({
         code: 0,
-        success: doc,
-      })
+        success: doc
+      });
 
     } else {
       res.send({
         code: 1,
         message: '置顶数量已达到上限'
-      })
+      });
     }
   } else {
     await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('title');
     const data = await topModel.findByIdAndDelete(_id);
     res.send({
       code: 0,
-      success: data,
-    })
+      success: data
+    });
   }
 
 
 
 
-})
+});
 
 
 module.exports = router;

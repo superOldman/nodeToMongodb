@@ -14,21 +14,21 @@ passport.deserializeUser(function(user, done) {
 });
 
 // use these strategies
-passport.use('local',new LocalStrategy(
-    {
-        usernameField:'email',
-        passwordField:'password',
-        passReqToCallback:true  
-    },
-    function (username, password, done) {
-        console.log('passportPage:'+username)
-        // console.log(`Trying to verify user, username:${username} password:${password}`)
-        // if (username != 'joe' || password != 'password') {
-        //     console.log(`Failed to verify user, username:${username} password:${password}`)
-        //     return done(null, false, { message: 'Invalid username or password' });
-        // }
-        // return done(null, { "username": username, "password": password },{message:'Successfully authenticated!'});
-    }
+passport.use('local', new LocalStrategy(
+  {
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback: true
+  },
+  function (username, password, done) {
+    console.log('passportPage:'+username);
+    // console.log(`Trying to verify user, username:${username} password:${password}`)
+    // if (username != 'joe' || password != 'password') {
+    //     console.log(`Failed to verify user, username:${username} password:${password}`)
+    //     return done(null, false, { message: 'Invalid username or password' });
+    // }
+    // return done(null, { "username": username, "password": password },{message:'Successfully authenticated!'});
+  }
 ));
 module.exports = passport;
 

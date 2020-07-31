@@ -34,7 +34,7 @@ class UserModel {
       }
     });
 
-    this.userModel = mongoose.model('userList', userSchema, 'userList'); //将该Schema发布为Model,userList就是集合名称
+    this.userModel = mongoose.model('userList', userSchema, 'userList'); // 将该Schema发布为Model,userList就是集合名称
   }
 
   // 注册用户
@@ -47,11 +47,11 @@ class UserModel {
   }
 
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.userModel.findOneAndUpdate(conditions, doc, options)
+    return this.userModel.findOneAndUpdate(conditions, doc, options);
   }
 
   findOneAndDelete(conditions, options) {
-    return this.userModel.findOneAndDelete(conditions, options)
+    return this.userModel.findOneAndDelete(conditions, options);
   }
 
 }

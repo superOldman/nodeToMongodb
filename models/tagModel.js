@@ -14,7 +14,7 @@ class TagModel {
       }
     });
 
-    this.tagModel = mongoose.model('tagList', tagSchema, 'tagList'); 
+    this.tagModel = mongoose.model('tagList', tagSchema, 'tagList');
   }
   // 填加
   instert(data) {
@@ -42,27 +42,27 @@ class TagModel {
 
 
   update(conditions, data, options) {
-    return this.tagModel.update(conditions, data, options)
+    return this.tagModel.update(conditions, data, options);
 
   }
   updateMany(data, options) {
-    return this.tagModel.updateMany(data, options)
+    return this.tagModel.updateMany(data, options);
   }
 
   deleteOne(data, callback) {
-    return this.tagModel.deleteOne(data, callback)
+    return this.tagModel.deleteOne(data, callback);
   }
   delete() {
-    return this.tagModel.delete()
+    return this.tagModel.delete();
   }
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.tagModel.findOneAndUpdate(conditions, doc, options)
+    return this.tagModel.findOneAndUpdate(conditions, doc, options);
   }
   findByIdAndUpdate(id, doc, options, callback) {
-    return this.tagModel.findByIdAndUpdate(id, doc, options)
+    return this.tagModel.findByIdAndUpdate(id, doc, options);
   }
   findByIdAndDelete(id, callback) {
-    return this.tagModel.findByIdAndDelete(id, callback)
+    return this.tagModel.findByIdAndDelete(id, callback);
   }
 
 }

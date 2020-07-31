@@ -34,11 +34,11 @@ class FolderModel {
   instert(data) {
     return this.folderModel(data).save();
   }
-  
+
   findOne(data) {
     return this.folderModel.findOne(data);
   }
-  
+
   find(findData, projection, options) {
     return this.folderModel.find(findData, projection, options);
   }
@@ -46,19 +46,19 @@ class FolderModel {
     return this.folderModel.findById(findData, projection, options);
   }
   deleteOne(data, callback) {
-    return this.folderModel.deleteOne(data, callback)
+    return this.folderModel.deleteOne(data, callback);
   }
   delete() {
-    return this.folderModel.delete()
+    return this.folderModel.delete();
   }
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.folderModel.findOneAndUpdate(conditions, doc, options)
+    return this.folderModel.findOneAndUpdate(conditions, doc, options);
   }
   findByIdAndUpdate(id, doc, options, callback) {
-    return this.folderModel.findByIdAndUpdate(id, doc, options)
+    return this.folderModel.findByIdAndUpdate(id, doc, options);
   }
   findByIdAndDelete(id, callback) {
-    return this.folderModel.findByIdAndDelete(id, callback)
+    return this.folderModel.findByIdAndDelete(id, callback);
   }
 
 }

@@ -23,7 +23,7 @@ class TopModel {
       }
     });
 
-    this.topModel = mongoose.model('topList', topSchema, 'topList'); 
+    this.topModel = mongoose.model('topList', topSchema, 'topList');
   }
   // 填加
   instert(data) {
@@ -33,7 +33,7 @@ class TopModel {
   findOne(data) {
     return this.topModel.findOne(data);
   }
-  
+
   find(findData, projection, options) {
     return this.topModel.find(findData, projection, options);
   }
@@ -43,19 +43,19 @@ class TopModel {
 
 
   deleteOne(data, callback) {
-    return this.topModel.deleteOne(data, callback)
+    return this.topModel.deleteOne(data, callback);
   }
   delete() {
-    return this.topModel.delete()
+    return this.topModel.delete();
   }
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.topModel.findOneAndUpdate(conditions, doc, options)
+    return this.topModel.findOneAndUpdate(conditions, doc, options);
   }
   findByIdAndUpdate(id, doc, options, callback) {
-    return this.topModel.findByIdAndUpdate(id, doc, options)
+    return this.topModel.findByIdAndUpdate(id, doc, options);
   }
   findByIdAndDelete(id, callback) {
-    return this.topModel.findByIdAndDelete(id, callback)
+    return this.topModel.findByIdAndDelete(id, callback);
   }
 
 }

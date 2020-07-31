@@ -1,4 +1,3 @@
-// ecosystem.config.js
 module.exports = {
   apps: [
     {
@@ -8,8 +7,7 @@ module.exports = {
       script: './bin/www',
       // 项目环境变量
       env: {
-        NODE_ENV: 'production',
-        // PORT: 3555
+        NODE_ENV: 'production'
       }
     }
   ]

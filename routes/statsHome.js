@@ -218,6 +218,12 @@ router.get('/lastYearPushPaperCount', async function (req, res) {
     })
 })
 
+// 专用统计资源
+// router.get('/statistical', function(req, res) {
+
+// })
+
+
 
 
 module.exports = router;

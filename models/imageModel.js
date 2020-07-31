@@ -32,11 +32,11 @@ class ImageModel {
   instert(data) {
     return this.imageModel(data).save();
   }
-  
+
   findOne(data) {
     return this.imageModel.findOne(data);
   }
-  
+
   find(findData, projection, options) {
     return this.imageModel.find(findData, projection, options);
   }
@@ -44,19 +44,19 @@ class ImageModel {
     return this.imageModel.findById(findData, projection, options);
   }
   deleteOne(data, callback) {
-    return this.imageModel.deleteOne(data, callback)
+    return this.imageModel.deleteOne(data, callback);
   }
   delete() {
-    return this.imageModel.delete()
+    return this.imageModel.delete();
   }
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.imageModel.findOneAndUpdate(conditions, doc, options)
+    return this.imageModel.findOneAndUpdate(conditions, doc, options);
   }
   findByIdAndUpdate(id, doc, options, callback) {
-    return this.imageModel.findByIdAndUpdate(id, doc, options)
+    return this.imageModel.findByIdAndUpdate(id, doc, options);
   }
   findByIdAndDelete(id, callback) {
-    return this.imageModel.findByIdAndDelete(id, callback)
+    return this.imageModel.findByIdAndDelete(id, callback);
   }
 
 }

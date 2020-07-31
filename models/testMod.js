@@ -22,13 +22,13 @@ class TestModel {
       }
     });
 
-    this.testModel = mongoose.model('testList', testSchema, 'testList'); //将该Schema发布为Model,userList就是集合名称
+    this.testModel = mongoose.model('testList', testSchema, 'testList'); // 将该Schema发布为Model,userList就是集合名称
   }
 
   getMod(data) {
     if(data) return this.testModel(data);
 
-    return this.testModel
+    return this.testModel;
   }
 
 

@@ -52,10 +52,10 @@ class HtmlModel {
       }
     });
 
-    this.htmlModel = mongoose.model('paperList', htmlSchema, 'paperList'); //将该Schema发布为Model,userList就是集合名称
+    this.htmlModel = mongoose.model('paperList', htmlSchema, 'paperList'); // 将该Schema发布为Model,userList就是集合名称
   }
   schema() {
-    return this.htmlModel
+    return this.htmlModel;
   }
   // 填加文章
   instert(data) {
@@ -75,17 +75,17 @@ class HtmlModel {
   }
   // data : {"email":"QQQQ@qq.com"}
   deleteOne(data, callback) {
-    return this.htmlModel.deleteOne(data, callback)
+    return this.htmlModel.deleteOne(data, callback);
   }
 
   findOneAndDelete(conditions, options) {
-    return this.htmlModel.findOneAndDelete(conditions, options)
+    return this.htmlModel.findOneAndDelete(conditions, options);
   }
   findByIdAndDelete(conditions, options) {
-    return this.htmlModel.findByIdAndDelete(conditions, options)
+    return this.htmlModel.findByIdAndDelete(conditions, options);
   }
   findByIdAndUpdate(id, doc, options, callback) {
-    return this.htmlModel.findByIdAndUpdate(id, doc)
+    return this.htmlModel.findByIdAndUpdate(id, doc);
   }
 
 }

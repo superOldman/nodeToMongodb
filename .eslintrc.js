@@ -15,12 +15,12 @@ module.exports = {
   extends: [
     'eslint:recommended' // 设置此项会开启所有eslint推荐的规则 详见 http://eslint.cn/docs/rules/
   ],
-  // 插件 检测 .vue 文件
+  // 插件
+  // "promise",
+  // "standard"
+  // "import",
   plugins: [
-    //   "import",
     'node'
-    //   "promise",
-    //   "standard"
   ],
   /**
     * "off"或者0    关闭规则关闭

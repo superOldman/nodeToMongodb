@@ -17,22 +17,32 @@ router.get('/', function (req, res, next) {
 
 // 判断登陆
 router.get('/islogin', async function (req, res, next) {
-  const result = await userModel.findOne({ username: req.session.username }, { password: 0 });
-  const len = result.lastLogin.length;
-  const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
 
-  res.send({
-    code: 0,
-    message: '已经登陆！',
-    username: req.session.username,
-    userMessage: {
-      title: '管理员',
-      userName: result.username,
-      lastLogin: lastLogin,
-      photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      motto: result.motto
-    }
-  });
+  if (req.session.username) {
+    const result = await userModel.findOne({ username: req.session.username }, { password: 0 });
+    const len = result.lastLogin.length;
+    const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
+
+    res.send({
+      code: 0,
+      message: '已经登陆！',
+      username: req.session.username,
+      userMessage: {
+        title: '管理员',
+        userName: result.username,
+        lastLogin: lastLogin,
+        photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+        motto: result.motto
+      }
+    });
+  } else {
+    res.send({
+      code: 1,
+      message: '请登录！'
+    });
+
+  }
+
 });
 
 

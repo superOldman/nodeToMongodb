@@ -6,6 +6,7 @@ const mongoose = require('../db.js');
 const visitModel = require('../models/visitModel.js');
 const htmlModel = require('../models/htmlModel.js');
 const imageModel = require('../models/imageModel.js');
+const capacityModel = require('../models/capacityModel.js');
 
 const { beforeIp, kbOrmb, backslashReplace } = require('../utils/utils');
 // 图片格式
@@ -22,7 +23,7 @@ function countFileSize(src) {
       let n = 0;
       console.log('文件', file);
       console.log('路径', src);
-      file.forEach( async (e, index) => {
+      file.forEach(async (e, index) => {
         // 遍历之后递归调用查看文件函数
         // 遍历目录得到的文件名称是不含路径的，需要将前面的绝对路径拼接
         let absolutePath = backslashReplace(path.resolve(path.join(src, e)));
@@ -32,7 +33,7 @@ function countFileSize(src) {
         if (imgFormat.includes(e.split('.')[1])) {
           const url = `${beforeIp}${src}/${e}`;
           const result = await imageModel.findOne({ url });
-          if( !result ) {
+          if (!result) {
             imageModel.instert({ url, size: kbOrmb(stats.size), updated_at: stats.mtime }).then();
           }
         }
@@ -163,37 +164,16 @@ router.get('/visitList', async function (req, res) {
 });
 
 
-// 图片存储量
+// 网站统计 显示在后台
 router.get('/resourceStats', async function (req, res) {
 
-  const pictureDetail = await countFileSize('public/images');
-  const baseData = await getCollections();
-
-  let tj = 0; // 统计数据库大小
-  let paperDetail = {
-    count: 0,
-    size: 0
-  };
-  baseData.forEach(item => {
-    let size = item.size;
-    tj += size;
-    if (item.ns.endsWith('paperList')) {
-
-      paperDetail.count = item.count;
-      paperDetail.size = kbOrmb(size);
-    }
-  });
-
-  res.send({
-    pictureDetail: {
-      count: pictureDetail.count,
-      size: (pictureDetail.size / 1024 / 1024).toFixed(2) + 'mb'
-    },
-    baseDataSize: kbOrmb(tj),
-    paperDetail,
-    allSize: pictureDetail.size + tj
-  });
-
+  const result = await capacityModel.findOne({ capacity: 1 });
+  // res.send(...result);countDocuments
+  // query.collection(MyModel.collection);
+  // const result = await capacityModel.schema().countDocuments();
+  // const a = await mongoose.connection.collection('paperList').stats();
+  // console.log(a);
+  res.send({ data: result });
 });
 
 // 统计文章
@@ -218,11 +198,51 @@ router.get('/lastYearPushPaperCount', async function (req, res) {
   });
 });
 
-// 专用统计资源
-// router.get('/statistical', function(req, res) {
+// 专用统计资源  暂定不对外跑
+router.get('/statistical', async function (req, res) {
+  const pictureDetail = await countFileSize('public/images');
+  const baseData = await getCollections();
 
-// })
+  let tj = 0; // 统计数据库大小
+  let paperDetail = {
+    count: 0,
+    size: 0
+  };
+  baseData.forEach(item => {
+    let size = item.size;
+    tj += size;
+    if (item.ns.endsWith('paperList')) {
 
+      paperDetail.count = item.count;
+      // paperDetail.size = kbOrmb(size);
+      paperDetail.size = size;
+    }
+  });
+
+
+
+  // 跑新数据 重新存 capacity: 2 等.. 用作对比
+  await capacityModel.findOneAndUpdate({ capacity: 1 }, {
+    pictureDetail,
+    baseDataSize: tj,
+    paperDetail
+  }, { upsert: true, setDefaultsOnInsert: true });
+
+
+
+  res.send({
+    pictureDetail,
+    baseDataSize: tj,
+    paperDetail
+  });
+
+
+});
+
+router.get('/qqq', async function (req, res) {
+  const result = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
+  res.send(result);
+});
 
 
 

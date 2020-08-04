@@ -107,7 +107,7 @@ app.all('*', function (req, res, next) {
     'users',
     'editor',
     'folder',
-    'statsHome',
+    // 'statsHome',
     'picture'
   ];
   let url = req.originalUrl;

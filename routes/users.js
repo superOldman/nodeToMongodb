@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
-// user对象
-let userModel = require('../models/userModel');
+// 模型对象
+const userModel = require('../models/userModel');
 const htmlModel = require('../models/htmlModel');
 const imageModel = require('../models/imageModel');
+const capacityModel = require('../models/capacityModel');
 
 // 加密
 let bcrypt = require('bcryptjs');
@@ -189,9 +190,10 @@ router.post('/uploadUserPhoto', function (req, res) {
         console.log('err', err);
       }
       if (files) {
+        const { pictureDetail } = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
+        capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count + 1, size: pictureDetail.size + files.file.size } }).then();
 
         await imageModel.instert({ url: beforeIp + files.file.path, size: kbOrmb(files.file.size), connection: [`${req.session.username}头像`] });
-
         await userModel.findOneAndUpdate({ username: req.session.username }, { photo: beforeIp + files.file.path }, { upsert: true });
 
         res.send({

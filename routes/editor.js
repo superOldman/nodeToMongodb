@@ -4,6 +4,7 @@ const router = express.Router();
 const multiparty = require('multiparty');
 const formidable = require('formidable');
 
+const mongoose = require('../db.js');
 
 // html对象
 const htmlModel = require('../models/htmlModel');
@@ -11,7 +12,7 @@ const folderModel = require('../models/folderModel');
 const tagModel = require('../models/tagModel');
 const topModel = require('../models/topModel');
 const imageModel = require('../models/imageModel');
-
+const capacityModel = require('../models/capacityModel');
 
 // utils
 const { beforeIp, kbOrmb, backslashReplace } = require('../utils/utils');
@@ -60,9 +61,12 @@ router.post('/saveHtml', function (req, res) {
         imageModel.findOneAndUpdate({ url }, { $push: { connection: `《${title}》引用` } }, { upsert: true, setDefaultsOnInsert: true }).then();
       });
     }
-
   })
-    .then(() => {
+    .then(async () => {
+
+      const { size, count } = await mongoose.connection.collection('paperList').stats();
+
+      capacityModel.findOneAndUpdate({ capacity: 1 }, { paperDetail: { count, size } }).then();
       // 保存数据
       res.send({
         code: 0,
@@ -179,9 +183,12 @@ router.post('/uploadImg', function (req, res) {
     }
     if (files) {
       const file = Object.keys(files)[0];
-
+      const { pictureDetail } = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
       const path = backslashReplace(files[file].path);
-      const result = await imageModel.instert({ url: beforeIp + path, size: kbOrmb(files[file].size) });
+
+      imageModel.instert({ url: beforeIp + path, size: kbOrmb(files[file].size) }).then();
+      capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count + 1, size: pictureDetail.size + files[file].size } }).then();
+
       res.send({
         success: 1, // 0 表示上传失败，1 表示上传成功
         message: '上传成功。',

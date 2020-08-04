@@ -89,9 +89,6 @@ router.get('/list', function (req, res, next) {
       });
   }
 
-
-
-
 });
 
 

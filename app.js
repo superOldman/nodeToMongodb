@@ -118,7 +118,7 @@ app.all('*', function (req, res, next) {
     interFaceFirst[2] !== 'statistical'
   ) {
     let username = req.session.username;
-    console.log('拦截登录：', username);
+    console.log('拦截登录：', req.session);
     if (username) {
       next();
     } else {

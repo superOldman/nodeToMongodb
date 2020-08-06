@@ -52,10 +52,7 @@ router.post('/login', async function (req, res) {
       dataJson.code = 1;
       dataJson.message = '登录失败,密码错误！';
     }
-
-    setTimeout(function() {
-      res.send(dataJson);
-    }, 3000);
+    res.send(dataJson);
   });
 });
 

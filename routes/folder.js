@@ -116,11 +116,15 @@ router.post('/pushPaper', function (req, res) {
 router.post('/deleteFolder', async function (req, res) {
 
   // 先删除文件夹里面的文章的归属
-  const { folderHasPaper } = await folderModel.findById(req.body._id, 'folderHasPaper');
+  const { folderHasPaper, folderName } = await folderModel.findById(req.body._id, { folderHasPaper: 1, folderName: 1 });
 
   folderHasPaper.forEach((item) => {
     htmlModel.findByIdAndUpdate(item._id, { hasFolder: '' }).exec();
   });
+
+  // 删除图片保留信息
+  imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `文件夹:${folderName} 封面` } } }, { $pullAll: { connection: [`文件夹:${folderName} 封面`] } }).then();
+
 
   const result = await folderModel.findByIdAndDelete(req.body._id);
 

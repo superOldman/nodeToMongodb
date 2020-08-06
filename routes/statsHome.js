@@ -16,33 +16,26 @@ const imgFormat = ['jpg', 'jpeg', 'svg', 'webp', 'png', 'gif'];
 
 // 统计文件函数
 
-
 function countFileSize(src) {
   return new Promise(function (result, reject) {
-    fs.readdir(src, function (err, file) {
+    fs.readdir(src, async function (err, file) {
       let n = 0;
-      console.log('文件', file);
-      console.log('路径', src);
-      file.forEach(async (e, index) => {
+      for (let i = 0; i < file.length; i++) {
         // 遍历之后递归调用查看文件函数
         // 遍历目录得到的文件名称是不含路径的，需要将前面的绝对路径拼接
-        let absolutePath = backslashReplace(path.resolve(path.join(src, e)));
-        const stats = fs.statSync(absolutePath);
-
+        let absolutePath = backslashReplace(path.resolve(path.join(src, file[i])));
+        const stats = await fs.statSync(absolutePath);
         // 如果是图片加到图片表里去、
-        if (imgFormat.includes(e.split('.')[1])) {
-          const url = `${beforeIp}${src}/${e}`;
+        if (imgFormat.includes(file[i].split('.')[1])) {
+          const url = `${beforeIp}${src}/${file[i]}`;
           const result = await imageModel.findOne({ url });
           if (!result) {
             imageModel.instert({ url, size: kbOrmb(stats.size), updated_at: stats.mtime }).then();
           }
         }
-
         n += stats.size;
-        if (index === file.length - 1) {
-          result({ count: file.length, size: n });
-        }
-      });
+      }
+      result({ count: file.length, size: n });
     });
   });
 }
@@ -222,7 +215,7 @@ router.get('/statistical', async function (req, res) {
 
 
   // 跑新数据 重新存 capacity: 2 等.. 用作对比
-  await capacityModel.findOneAndUpdate({ capacity: 1 }, {
+  await capacityModel.findOneAndUpdate({ capacity: 99 }, {
     pictureDetail,
     baseDataSize: tj,
     paperDetail

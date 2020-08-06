@@ -107,13 +107,16 @@ app.all('*', function (req, res, next) {
     'users',
     'editor',
     'folder',
-    // 'statsHome',
+    'statsHome',
     'picture'
   ];
   let url = req.originalUrl;
   let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, '').split('/');
 
-  if (InterFace.includes(interFaceFirst[1]) && interFaceFirst[2] !== 'login') {
+  if (InterFace.includes(interFaceFirst[1]) &&
+    interFaceFirst[2] !== 'login' &&
+    interFaceFirst[2] !== 'statistical'
+  ) {
     let username = req.session.username;
     console.log('拦截登录：', username);
     if (username) {

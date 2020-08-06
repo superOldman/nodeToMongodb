@@ -27,14 +27,19 @@ function delFile(path, reservePath) {
         if (fs.statSync(currentPath).isDirectory()) {
           delFile(currentPath, reservePath);
         } else {
+          const stats = fs.statSync(currentPath);
           fs.unlinkSync(currentPath);
+          return stats;
         }
       });
       if (path != reservePath) {
         fs.rmdirSync(path);
       }
     } else {
+      const stats = fs.statSync(path);
       fs.unlinkSync(path);
+      return stats;
+
     }
   }
 }

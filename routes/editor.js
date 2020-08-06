@@ -64,9 +64,10 @@ router.post('/saveHtml', function (req, res) {
   })
     .then(async () => {
 
+      // 统计文章size
       const { size, count } = await mongoose.connection.collection('paperList').stats();
-
       capacityModel.findOneAndUpdate({ capacity: 1 }, { paperDetail: { count, size } }).then();
+
       // 保存数据
       res.send({
         code: 0,
@@ -136,6 +137,11 @@ router.post('/saveEditorHtml', async function (req, res) {
     imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `《${editDoc.title}》封面` } }).then();
     imageModel.findOneAndUpdate({ url: saveImageUrl }, { $pull: { connection: `《${title}》封面` } }).then();
   }
+
+
+  // 统计文章size
+  const { size, count } = await mongoose.connection.collection('paperList').stats();
+  capacityModel.findOneAndUpdate({ capacity: 1 }, { paperDetail: { count, size } }).then();
 
   await htmlModel.findByIdAndUpdate(_id, { ...editDoc, saveImageUrl: cover });
   res.send({ code: 0, message: '修改成功' });
@@ -210,12 +216,24 @@ router.post('/destroy', async function (req, res) { // 接收 _id
   // { participant: { $elemMatch: { $eq: 1 } } }
 
   try {
-    // 尝试删除top列表
+    // 删除置顶列表
     await topModel.findByIdAndDelete(req.body._id);
-
+    // 删除文件夹列表
     await folderModel.findOneAndUpdate({ folderHasPaper: { $elemMatch: { _id: req.body._id } } }, { $pull: { folderHasPaper: { _id: req.body._id } } });
+    // 删除图片保留信息
+    const data = await htmlModel.findById(req.body._id, { title: 1, paperUseImg: 1 });
+    imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${data.title}》封面` } } }, { $pullAll: { connection: [`《${data.title}》封面`]   }  }).then();
+    data.paperUseImg.forEach(() => {
+      imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${data.title}》引用` } } }, { $pullAll: { connection: [`《${data.title}》引用`] }  } ).then();
+    });
+
+    // 统计文章size
+    const { size, count } = await mongoose.connection.collection('paperList').stats();
+    capacityModel.findOneAndUpdate({ capacity: 1 }, { paperDetail: { count, size } }).then();
+
     // 根据待办事项的id 来删除它
     const result = await htmlModel.findByIdAndDelete(req.body._id);
+
     res.send({
       code: 0,
       data: result

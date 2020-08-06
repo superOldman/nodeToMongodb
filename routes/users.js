@@ -42,6 +42,8 @@ router.post('/login', async function (req, res) {
 
       }
       req.session.username = username;
+
+      console.log('设置session', req.session);
       dataJson.code = 0;
       dataJson.message = '登录成功';
       dataJson.lastLogin = lastLogin;

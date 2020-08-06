@@ -70,8 +70,9 @@ router.post('/deleteImage', async function (req, res) {
     if (result) {
       const path = result.url.split(beforeIp)[1];
       const { size } = delFile(path);
-      const { pictureDetail } = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
-      if (pictureDetail) {
+      const data = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
+      if(data) {
+        const { pictureDetail } = data;
         capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count - 1, size: pictureDetail.size - size } }).then();
       }
       res.send({ code: 0, message: '删除成功!' });

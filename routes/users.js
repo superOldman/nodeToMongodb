@@ -74,6 +74,7 @@ router.post('/register', function (req, res, next) {
         email: req.body.email,
         password: hash
       }).then(function (data) {
+        req.session.name = req.body.username;
         res.send({
           code: 0,
           message: '注册成功'
@@ -195,6 +196,7 @@ router.post('/uploadUserPhoto', function (req, res) {
         const { pictureDetail } = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
         capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count + 1, size: pictureDetail.size + files.file.size } }).then();
 
+        await imageModel.findOneAndUpdate({ connection: [`${req.session.username}头像`] }, { connection: [] });
         await imageModel.instert({ url: beforeIp + files.file.path, size: kbOrmb(files.file.size), connection: [`${req.session.username}头像`] });
         await userModel.findOneAndUpdate({ username: req.session.username }, { photo: beforeIp + files.file.path }, { upsert: true });
 

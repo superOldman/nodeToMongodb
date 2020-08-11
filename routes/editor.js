@@ -15,7 +15,8 @@ const imageModel = require('../models/imageModel');
 const capacityModel = require('../models/capacityModel');
 
 // utils
-const { beforeIp, kbOrmb, backslashReplace } = require('../utils/utils');
+const { beforeIp, kbOrmb, backslashReplace, computeLevel } = require('../utils/utils');
+const userModel = require('../models/userModel.js');
 
 
 
@@ -36,13 +37,9 @@ router.post('/saveHtml', function (req, res) {
     saveImageUrl: cover,
     hasTags,
     hasFolder
-  }).then(function (data) {
+  }).then( async function (data) {
     // 添加到文件夹列表
     if (data.hasFolder) {
-      //* folderHasPaper：[{
-      //*    _id: 文章id,
-      //*    title: 文章标题
-      //*  }]
       folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then();
     }
     // 添加到标签列表
@@ -61,6 +58,14 @@ router.post('/saveHtml', function (req, res) {
         imageModel.findOneAndUpdate({ url }, { $push: { connection: `《${title}》引用` } }, { upsert: true, setDefaultsOnInsert: true }).then();
       });
     }
+
+    // 更新等级
+    const { level }= await userModel.findOne({ username: author }, { level: 1 });
+    const countLevel = computeLevel(markdown.length, level.textSize);
+
+    level.lv += countLevel.lv;
+    level.textSize = countLevel.textSize;
+    userModel.findOneAndUpdate({ username: author }, { level }).then();
   })
     .then(async () => {
 
@@ -82,8 +87,8 @@ router.post('/saveEditorHtml', async function (req, res) {
 
   const { _id, ...editDoc } = req.body;
   const {
-    hasFolder, hasTags, paperUseImg, saveImageUrl, title
-  } = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1, paperUseImg: 1, saveImageUrl: 1, title: 1 });
+    hasFolder, hasTags, paperUseImg, saveImageUrl, title, markdown
+  } = await htmlModel.findById(_id, { hasTags: 1, hasFolder: 1, paperUseImg: 1, saveImageUrl: 1, title: 1, markdown: 1 });
 
   // 查看是否修改了标签
   let clearup = {};
@@ -142,6 +147,13 @@ router.post('/saveEditorHtml', async function (req, res) {
   // 统计文章size
   const { size, count } = await mongoose.connection.collection('paperList').stats();
   capacityModel.findOneAndUpdate({ capacity: 1 }, { paperDetail: { count, size } }).then();
+
+  // 更新等级
+  const { level } = await userModel.findOne({ username: editDoc.author }, { level: 1 });
+  const countLevel = computeLevel(editDoc.markdown.length - markdown.length, level.textSize);
+  level.lv += countLevel.lv;
+  level.textSize = countLevel.textSize;
+  userModel.findOneAndUpdate({ username: editDoc.author }, { level }).then();
 
   await htmlModel.findByIdAndUpdate(_id, { ...editDoc, saveImageUrl: cover });
   res.send({ code: 0, message: '修改成功' });
@@ -221,15 +233,26 @@ router.post('/destroy', async function (req, res) { // 接收 _id
     // 删除文件夹列表
     await folderModel.findOneAndUpdate({ folderHasPaper: { $elemMatch: { _id: req.body._id } } }, { $pull: { folderHasPaper: { _id: req.body._id } } });
     // 删除图片保留信息
-    const data = await htmlModel.findById(req.body._id, { title: 1, paperUseImg: 1 });
-    imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${data.title}》封面` } } }, { $pullAll: { connection: [`《${data.title}》封面`]   }  }).then();
-    data.paperUseImg.forEach(() => {
-      imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${data.title}》引用` } } }, { $pullAll: { connection: [`《${data.title}》引用`] }  } ).then();
+    const { title, paperUseImg, markdown } = await htmlModel.findById(req.body._id, { title: 1, paperUseImg: 1, markdown: 1 });
+    imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${title}》封面` } } }, { $pullAll: { connection: [`《${title}》封面`]   }  }).then();
+    paperUseImg.forEach(() => {
+      imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${title}》引用` } } }, { $pullAll: { connection: [`《${title}》引用`] }  } ).then();
     });
 
     // 统计文章size
     const { size, count } = await mongoose.connection.collection('paperList').stats();
     capacityModel.findOneAndUpdate({ capacity: 1 }, { paperDetail: { count, size } }).then();
+
+    // 更新等级
+    const { level } = await userModel.findOne({ username: req.session.username }, { level: 1 });
+    const countLevel = computeLevel(-markdown.length, level.textSize);
+    console.log(countLevel);
+    level.lv += countLevel.lv;
+    level.textSize = countLevel.textSize;
+    console.log(level);
+    userModel.findOneAndUpdate({ username: req.session.username }, { level }).then();
+
+
 
     // 根据待办事项的id 来删除它
     const result = await htmlModel.findByIdAndDelete(req.body._id);

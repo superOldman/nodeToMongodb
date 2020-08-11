@@ -51,7 +51,10 @@ app.use(
     secret: 'skmtest',
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 12 }
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 12
+      // sameSite: 'none'
+    }
   })
 );
 
@@ -115,7 +118,10 @@ app.all('*', function (req, res, next) {
 
   if (InterFace.includes(interFaceFirst[1]) &&
     interFaceFirst[2] !== 'login' &&
-    interFaceFirst[2] !== 'statistical'
+    interFaceFirst[2] !== 'register' &&
+    interFaceFirst[2] !== 'statistical' &&
+    interFaceFirst[2] !== 'qqq' &&
+    interFaceFirst[2] !== 'getContent'
   ) {
     let username = req.session.username;
     console.log('拦截登录：', req.session);

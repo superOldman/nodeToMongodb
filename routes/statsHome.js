@@ -8,7 +8,8 @@ const htmlModel = require('../models/htmlModel.js');
 const imageModel = require('../models/imageModel.js');
 const capacityModel = require('../models/capacityModel.js');
 
-const { beforeIp, kbOrmb, backslashReplace } = require('../utils/utils');
+const { beforeIp, kbOrmb, backslashReplace, computeLevel } = require('../utils/utils');
+const userModel = require('../models/userModel.js');
 // 图片格式
 // bmp, jpg, png, tif, gif, pcx, tga, exif, fpx, svg, psd, cdr, pcd, dxf, ufo, eps, ai, raw, WMF, webp
 const imgFormat = ['jpg', 'jpeg', 'svg', 'webp', 'png', 'gif'];
@@ -232,11 +233,38 @@ router.get('/statistical', async function (req, res) {
 
 });
 
-router.get('/qqq', async function (req, res) {
-  const result = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
-  res.send(result);
+
+// 专用统计文章字数  暂定不对外跑
+router.get('/getContent', async function (req, res) {
+  const result = await htmlModel.find({ author: 'superOldman' }, { markdown: 1 });
+  console.log(result);
+  let len = 0;
+  result.forEach((e)=>{
+    len += e.markdown.length;
+  });
+  console.log('len', len);
+
+  const level = computeLevel(len);
+  console.log(level);
+  level.lv +=1 ;
+  await userModel.findOneAndUpdate({ username: 'superOldman' }, { level }, { upsert: true });
+
+  res.send(level);
 });
 
+// router.get('/qqq', async function (req, res) {
+//   // 更新等级
+//   const { level } = await userModel.findOne({ username: 'superOldman' }, { level: 1 });
+
+//   const countLevel = computeLevel(3888, 2567);
+
+//   level.lv += countLevel.lv;
+//   level.textSize = countLevel.textSize;
+//   userModel.findOneAndUpdate({ username: 'superOldman'  }, { level }).exec();
+
+//   res.send(level);
+
+// });
 
 
 module.exports = router;

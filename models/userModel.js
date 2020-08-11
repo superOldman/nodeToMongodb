@@ -27,10 +27,16 @@ class UserModel {
         type: String,
         required: false
       },
-
       lastLogin: {
         type: Array,
         default: []
+      },
+      level: {
+        type: Object,
+        default: {
+          lv: 1,
+          textSize: 0
+        }
       }
     });
 

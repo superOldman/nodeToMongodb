@@ -236,7 +236,8 @@ router.get('/statistical', async function (req, res) {
 
 // 专用统计文章字数  暂定不对外跑
 router.get('/getContent', async function (req, res) {
-  const result = await htmlModel.find({ author: 'superOldman' }, { markdown: 1 });
+  const author = req.query.author;
+  const result = await htmlModel.find({ author }, { markdown: 1 });
   console.log(result);
   let len = 0;
   result.forEach((e)=>{
@@ -247,24 +248,24 @@ router.get('/getContent', async function (req, res) {
   const level = computeLevel(len);
   console.log(level);
   level.lv +=1 ;
-  await userModel.findOneAndUpdate({ username: 'superOldman' }, { level }, { upsert: true });
+  await userModel.findOneAndUpdate({ username: author }, { level }, { upsert: true });
 
   res.send(level);
 });
 
-// router.get('/qqq', async function (req, res) {
-//   // 更新等级
-//   const { level } = await userModel.findOne({ username: 'superOldman' }, { level: 1 });
+router.get('/qqq', async function (req, res) {
+  // 更新等级
+  // const { level } = await userModel.findOne({ username: 'superOldman' }, { level: 1 });
 
-//   const countLevel = computeLevel(3888, 2567);
+  // const countLevel = computeLevel(3888, 2567);
 
-//   level.lv += countLevel.lv;
-//   level.textSize = countLevel.textSize;
-//   userModel.findOneAndUpdate({ username: 'superOldman'  }, { level }).exec();
+  // level.lv += countLevel.lv;
+  // level.textSize = countLevel.textSize;
+  // userModel.findOneAndUpdate({ username: 'superOldman'  }, { level }).exec();
 
-//   res.send(level);
+  res.send({});
 
-// });
+});
 
 
 module.exports = router;

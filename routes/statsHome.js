@@ -152,7 +152,7 @@ router.get('/visit', async function (req, res) {
 router.get('/visitList', async function (req, res) {
   let findData = await visitModel.find().sort({ updated_at: 1 });
   res.send({
-    code: 0,
+    code: 200,
     data: findData
   });
 });
@@ -187,7 +187,7 @@ router.get('/lastYearPushPaperCount', async function (req, res) {
     }
   });
   res.send({
-    code: 0,
+    code: 200,
     data: pushPaperDate
   });
 });

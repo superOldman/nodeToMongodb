@@ -7,6 +7,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+// 引入jwt token工具
+const JwtUtil = require('./jwt');
 
 // 业务模块
 var indexRouter = require('./routes/index');
@@ -45,18 +47,18 @@ app.get('/public/images/*', function (req, res) {
 /**
  *  express-session 配置
  */
-const session = require('express-session');
-app.use(
-  session({
-    secret: 'skmtest',
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 12
-      // sameSite: 'none'
-    }
-  })
-);
+// const session = require('express-session');
+// app.use(
+//   session({
+//     secret: 'skmtest',
+//     resave: true,
+//     saveUninitialized: true,
+//     cookie: {
+//       maxAge: 1000 * 60 * 60 * 12
+//       // sameSite: 'none'
+//     }
+//   })
+// );
 
 // 跨域配置
 app.all('*', function (req, res, next) {
@@ -77,12 +79,15 @@ app.all('*', function (req, res, next) {
   ];
 
 
-  console.log('拦截跨域');
-  console.log(req.headers.origin);
-  if (orginList.includes(req.headers.origin.toLowerCase())) {
-    // 设置允许跨域的域名，*代表允许任意域名跨域
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
-  }
+  // console.log('拦截跨域');
+  // console.log(req.headers);
+  // console.log(req);
+  // if (orginList.includes(req.headers.origin.toLowerCase())) {
+  //   // 设置允许跨域的域名，*代表允许任意域名跨域
+  //   res.header('Access-Control-Allow-Origin', req.headers.origin);
+  // }
+
+  // console.log('走')
   // 允许所有跨域
   // res.header('Access-Control-Allow-Origin', '*');
 
@@ -115,26 +120,39 @@ app.all('*', function (req, res, next) {
   ];
   let url = req.originalUrl;
   let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, '').split('/');
+  // if (InterFace.includes(interFaceFirst[1]) &&
+  //   interFaceFirst[2] !== 'login' &&
+  //   interFaceFirst[2] !== 'register' &&
+  //   interFaceFirst[2] !== 'statistical' &&
+  //   interFaceFirst[2] !== 'qqq' &&
+  //   !interFaceFirst[2].startsWith('getContent')
+  // ) {
+  if (InterFace.includes(interFaceFirst[1])) {
+    if (interFaceFirst[2] !== 'login') {
+      let token = req.headers['k-token'];
 
-  if (InterFace.includes(interFaceFirst[1]) &&
-    interFaceFirst[2] !== 'login' &&
-    interFaceFirst[2] !== 'register' &&
-    interFaceFirst[2] !== 'statistical' &&
-    interFaceFirst[2] !== 'qqq' &&
-    !interFaceFirst[2].startsWith('getContent')
-  ) {
-    let username = req.session.username;
-    console.log('拦截登录：', req.session);
-    if (username) {
-      next();
-    } else {
-      res.status(403).send({
-        code: 1,
-        message: '请登录！'
-      });
+      console.log('token', req.headers)
+      console.log('token', token)
+      let jwt = new JwtUtil(token);
+      let result = jwt.verifyToken();
+      // 如果考验通过就next，否则就返回登陆信息不正确
+      if (result == 'err') {
+        //     res.status(403).send({
+        //       code: 1,
+        //       message: '请登录！'
+        //     });
+
+        res.send({ code: 403, msg: '登录已过期,请重新登录' });
+      }
+      else {
+        next();
+      }
+    }
+    else {
+      next()
     }
   } else {
-    next();
+    next()
   }
 });
 

@@ -66,6 +66,20 @@ function computeLevel(num, add = 0) {
 }
 
 
+// 解析cookie
+function parseCookie(cookie) {
+  const obj = {}
+  cookie.split(';').forEach(e=>{
+    if(!e) return
+    const arr = e.split('=')
+    const key = arr[0]
+    const val = arr[1]
+    obj[key] = val
+  })
+  return obj
+}
+
+
 module.exports =  {
-  beforeIp, kbOrmb, delFile, backslashReplace, computeLevel
+  beforeIp, kbOrmb, delFile, backslashReplace, computeLevel, parseCookie
 };

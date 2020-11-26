@@ -15,36 +15,7 @@ router.get('/', function (req, res, next) {
 
 
 
-// 判断登陆
-router.get('/islogin', async function (req, res, next) {
 
-  if (req.session.username) {
-    const result = await userModel.findOne({ username: req.session.username }, { password: 0 });
-    const len = result.lastLogin.length;
-    const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
-
-    res.send({
-      code: 0,
-      message: '已经登陆！',
-      username: req.session.username,
-      userMessage: {
-        title: '管理员',
-        userName: result.username,
-        lastLogin: lastLogin,
-        photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-        motto: result.motto,
-        level: result.level
-      }
-    });
-  } else {
-    res.send({
-      code: 1,
-      message: '请登录！'
-    });
-
-  }
-
-});
 
 
 // 查寻列表
@@ -71,7 +42,7 @@ router.get('/list', function (req, res, next) {
       htmlModel.find(findData, projection, options)
     ]).then(data => {
       res.send({
-        code: 0,
+        code: 200,
         data: {
           list: data[1],
           sum: data[0].count
@@ -84,7 +55,7 @@ router.get('/list', function (req, res, next) {
       .exec(function (err, doc, count) {
 
         res.send({
-          code: 0,
+          code: 200,
           data: doc
         });
       });
@@ -110,7 +81,7 @@ router.get('/folderOrTagList', function (req, res, next) {
   htmlModel.find(findData, projection, options)
     .exec(function (err, doc, count) {
       res.send({
-        code: 0,
+        code: 200,
         data: doc
       });
     });
@@ -121,7 +92,7 @@ router.get('/folderOrTagList', function (req, res, next) {
 router.get('/topList', function (req, res, next) {
   topModel.find({}, null, { limit: 2 }).exec(function (err, doc) {
     res.send({
-      code: 0,
+      code: 200,
       data: doc
     });
   });
@@ -133,7 +104,7 @@ router.get('/folderAndTagList', function (req, res, next) {
   // , folderModel.find()
   Promise.all([folderModel.find().lean(), tagModel.find().lean()]).then((data) => {
     res.send({
-      code: 0,
+      code: 200,
       data: {
         folderList: data[0],
         tagList: data[1]
@@ -152,7 +123,7 @@ router.get('/searchById', function (req, res, next) {
         console.log(err);
       } else {
         res.send({
-          code: 0,
+          code: 200,
           list: data
         });
       }

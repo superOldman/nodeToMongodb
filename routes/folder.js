@@ -10,7 +10,7 @@ const imageModel = require('../models/imageModel');
 router.get('/getFolderList', function (req, res) {
   folderModel.find().then(function (data) {
     res.send({
-      code: 0,
+      code: 200,
       data
     });
   });
@@ -35,7 +35,7 @@ router.post('/saveFolder', function (req, res) {
   }
   folderModel.instert(req.body).then(function (data) {
     res.send({
-      code: 0,
+      code: 200,
       message: '保存成功！',
       data
     });
@@ -65,7 +65,7 @@ router.post('/saveEditorFolder', async function (req, res) {
 
   const data = await folderModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
   res.send({
-    code: 0,
+    code: 200,
     message: '保存成功！',
     data
   });
@@ -97,7 +97,7 @@ router.post('/pushPaper', function (req, res) {
 
     }).then((data) => {
       res.send({
-        code: 0,
+        code: 200,
         data: data.folderHasPaper
       });
     });
@@ -130,7 +130,7 @@ router.post('/deleteFolder', async function (req, res) {
 
   console.log(result);
 
-  res.send({ code: 0, message: '删除成功！' });
+  res.send({ code: 200, message: '删除成功！' });
 
 });
 

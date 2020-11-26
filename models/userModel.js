@@ -3,6 +3,10 @@ const mongoose = require('../db.js');
 class UserModel {
   constructor() {
     const userSchema = new mongoose.Schema({
+      temporaryToken: {
+        type: String,
+        required: false
+      },
       email: {
         type: String,
         required: true

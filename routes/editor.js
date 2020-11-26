@@ -15,7 +15,7 @@ const imageModel = require('../models/imageModel');
 const capacityModel = require('../models/capacityModel');
 
 // utils
-const { beforeIp, kbOrmb, backslashReplace, computeLevel } = require('../utils/utils');
+const { beforeIp, kbOrmb, backslashReplace, computeLevel, parseCookie } = require('../utils/utils');
 const userModel = require('../models/userModel.js');
 
 
@@ -37,7 +37,7 @@ router.post('/saveHtml', function (req, res) {
     saveImageUrl: cover,
     hasTags,
     hasFolder
-  }).then( async function (data) {
+  }).then(async function (data) {
     // 添加到文件夹列表
     if (data.hasFolder) {
       folderModel.findOneAndUpdate({ folderName: data.hasFolder }, { $push: { folderHasPaper: { _id: data._id, title: data.title } } }).then();
@@ -60,7 +60,7 @@ router.post('/saveHtml', function (req, res) {
     }
 
     // 更新等级
-    const { level }= await userModel.findOne({ username: author }, { level: 1 });
+    const { level } = await userModel.findOne({ username: author }, { level: 1 });
     const countLevel = computeLevel(markdown.length, level.textSize);
 
     level.lv += countLevel.lv;
@@ -75,7 +75,7 @@ router.post('/saveHtml', function (req, res) {
 
       // 保存数据
       res.send({
-        code: 0,
+        code: 200,
         message: '保存成功'
       });
     });
@@ -156,7 +156,7 @@ router.post('/saveEditorHtml', async function (req, res) {
   userModel.findOneAndUpdate({ username: editDoc.author }, { level }).then();
 
   await htmlModel.findByIdAndUpdate(_id, { ...editDoc, saveImageUrl: cover });
-  res.send({ code: 0, message: '修改成功' });
+  res.send({ code: 200, message: '修改成功' });
 
 });
 
@@ -219,6 +219,9 @@ router.post('/uploadImg', function (req, res) {
   });
 });
 
+
+
+
 // 删除文章
 router.post('/destroy', async function (req, res) { // 接收 _id
   // 删除 模型数组里某一项
@@ -226,7 +229,9 @@ router.post('/destroy', async function (req, res) { // 接收 _id
 
   // 查询数组某一项
   // { participant: { $elemMatch: { $eq: 1 } } }
+  const username = parseCookie(req.headers.cookie)
 
+  console.log('un', username)
   try {
     // 删除置顶列表
     await topModel.findByIdAndDelete(req.body._id);
@@ -234,9 +239,9 @@ router.post('/destroy', async function (req, res) { // 接收 _id
     await folderModel.findOneAndUpdate({ folderHasPaper: { $elemMatch: { _id: req.body._id } } }, { $pull: { folderHasPaper: { _id: req.body._id } } });
     // 删除图片保留信息
     const { title, paperUseImg, markdown } = await htmlModel.findById(req.body._id, { title: 1, paperUseImg: 1, markdown: 1 });
-    imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${title}》封面` } } }, { $pullAll: { connection: [`《${title}》封面`]   }  }).then();
+    imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${title}》封面` } } }, { $pullAll: { connection: [`《${title}》封面`] } }).then();
     paperUseImg.forEach(() => {
-      imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${title}》引用` } } }, { $pullAll: { connection: [`《${title}》引用`] }  } ).then();
+      imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `《${title}》引用` } } }, { $pullAll: { connection: [`《${title}》引用`] } }).then();
     });
 
     // 统计文章size
@@ -244,13 +249,13 @@ router.post('/destroy', async function (req, res) { // 接收 _id
     capacityModel.findOneAndUpdate({ capacity: 1 }, { paperDetail: { count, size } }).then();
 
     // 更新等级
-    const { level } = await userModel.findOne({ username: req.session.username }, { level: 1 });
+    const { level } = await userModel.findOne({ username }, { level: 1 });
     const countLevel = computeLevel(-markdown.length, level.textSize);
     console.log(countLevel);
     level.lv += countLevel.lv;
     level.textSize = countLevel.textSize;
     console.log(level);
-    userModel.findOneAndUpdate({ username: req.session.username }, { level }).then();
+    userModel.findOneAndUpdate({ username }, { level }).then();
 
 
 
@@ -258,7 +263,7 @@ router.post('/destroy', async function (req, res) { // 接收 _id
     const result = await htmlModel.findByIdAndDelete(req.body._id);
 
     res.send({
-      code: 0,
+      code: 200,
       data: result
     });
   } catch (err) {
@@ -283,7 +288,7 @@ router.post('/setTop', async function (req, res) {
       const doc = await topModel.findByIdAndUpdate(_id, update, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
 
       res.send({
-        code: 0,
+        code: 200,
         success: doc
       });
 
@@ -297,7 +302,7 @@ router.post('/setTop', async function (req, res) {
     await htmlModel.findByIdAndUpdate(_id, { stick }, { new: true }).lean().select('title');
     const data = await topModel.findByIdAndDelete(_id);
     res.send({
-      code: 0,
+      code: 200,
       success: data
     });
   }

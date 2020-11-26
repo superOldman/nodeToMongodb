@@ -37,7 +37,7 @@ router.get('/imageList', async function (req, res) {
     const schema = await imageModel.schema().collection.stats();
     const list = await imageModel.find(findData, projection, options);
     res.send({
-      code: 0,
+      code: 200,
       data: { list, sum: schema.count }
     });
   } else {
@@ -46,7 +46,7 @@ router.get('/imageList', async function (req, res) {
       .exec(function (err, doc, count) {
 
         res.send({
-          code: 0,
+          code: 200,
           data: doc
         });
       });
@@ -55,7 +55,7 @@ router.get('/imageList', async function (req, res) {
   // try {
   //     const result = await imageModel.find({});
   //     if (result) {
-  //         res.send({ code: 0, result });
+  //         res.send({ code: 200, result });
   //     }
   // } catch (error) {
   //     console.log(error)
@@ -75,7 +75,7 @@ router.post('/deleteImage', async function (req, res) {
         const { pictureDetail } = data;
         capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count - 1, size: pictureDetail.size - size } }).then();
       }
-      res.send({ code: 0, message: '删除成功!' });
+      res.send({ code: 200, message: '删除成功!' });
     }
   } catch (error) {
     console.log(error);

@@ -103,7 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
-
-
-
+# 图片
 /public/images
+
+# 秘钥
+/utils/pem/

@@ -29,6 +29,8 @@ router.get('/islogin', async function (req, res, next) {
   console.log('islogin head',req.headers['k-token'])
   // if (req.session.username) {
   const result = await userModel.findOne({ temporaryToken: req.headers['k-token'] }, { password: 0 });
+  if(result){
+  
   const len = result.lastLogin.length;
   const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2];
 
@@ -45,6 +47,9 @@ router.get('/islogin', async function (req, res, next) {
       level: result.level
     }
   });
+  } else {
+    res.send({code: 403, message: '登录过期'})
+  }
 
 });
 

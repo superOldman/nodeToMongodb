@@ -167,7 +167,7 @@ router.get('/resourceStats', async function (req, res) {
   // const result = await capacityModel.schema().countDocuments();
   // const a = await mongoose.connection.collection('paperList').stats();
   // console.log(a);
-  res.send({ data: result });
+  res.send({ data: result || [] });
 });
 
 // 统计文章

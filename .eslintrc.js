@@ -28,7 +28,7 @@ module.exports = {
     * "error"或者2    把规则作为一个错误（退出代码触发时为1）
     */
   rules: {
-    'semi': 1,
+    'semi': [1, 'never'], // 去掉分号
     'quotes': [1, 'single'], // 引号类型
     'no-unused-vars': 0, // 检查未使用变量
     'no-undef': 0, // 检查未定义就使用变量
@@ -44,4 +44,4 @@ module.exports = {
     'comma-spacing': [1, { 'before': false, 'after': true }], // 控制逗号前后的空格
     'key-spacing': [1, { 'beforeColon': false, 'afterColon': true }]// 对象字面量中冒号的前后空格
   }
-};
+}

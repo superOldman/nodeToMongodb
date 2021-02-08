@@ -1,9 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 
-const folderModel = require('../models/folderModel');// 引入模型
-const htmlModel = require('../models/htmlModel');
-const imageModel = require('../models/imageModel');
+const folderModel = require('../models/folderModel')// 引入模型
+const htmlModel = require('../models/htmlModel')
+const imageModel = require('../models/imageModel')
 
 
 // 文件夹列表
@@ -12,9 +12,9 @@ router.get('/getFolderList', function (req, res) {
     res.send({
       code: 200,
       data
-    });
-  });
-});
+    })
+  })
+})
 
 /**
  * 新增文件夹
@@ -27,20 +27,20 @@ router.get('/getFolderList', function (req, res) {
  *
  */
 router.post('/saveFolder', function (req, res) {
-  console.log('zoou', req.body);
+  console.log('zoou', req.body)
 
-  const { cover, folderName } = req.body;
+  const { cover, folderName } = req.body
   if (cover) {
-    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then();
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then()
   }
   folderModel.instert(req.body).then(function (data) {
     res.send({
       code: 200,
       message: '保存成功！',
       data
-    });
-  });
-});
+    })
+  })
+})
 
 
 /**
@@ -56,20 +56,20 @@ router.post('/saveFolder', function (req, res) {
  */
 router.post('/saveEditorFolder', async function (req, res) {
 
-  const { cover, folderName } = req.body;
-  const oldData = await folderModel.findById(req.body._id);
+  const { cover, folderName } = req.body
+  const oldData = await folderModel.findById(req.body._id)
   if (oldData && cover !== oldData.cover) {
-    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then();
-    imageModel.findOneAndUpdate({ url: oldData.cover }, { $pull: { connection: `文件夹:${oldData.folderName} 封面` } }).then();
+    imageModel.findOneAndUpdate({ url: cover }, { $push: { connection: `文件夹:${folderName} 封面` } }).then()
+    imageModel.findOneAndUpdate({ url: oldData.cover }, { $pull: { connection: `文件夹:${oldData.folderName} 封面` } }).then()
   }
 
-  const data = await folderModel.findByIdAndUpdate(req.body._id, req.body, { new: true });
+  const data = await folderModel.findByIdAndUpdate(req.body._id, req.body, { new: true })
   res.send({
     code: 200,
     message: '保存成功！',
     data
-  });
-});
+  })
+})
 
 
 /**
@@ -91,17 +91,17 @@ router.post('/pushPaper', function (req, res) {
       // 更新文章属性
       data.folderHasPaper.forEach((item) => {
 
-        htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName }).then();
-      });
-      return data;
+        htmlModel.findByIdAndUpdate(item._id, { hasFolder: data.folderName }).then()
+      })
+      return data
 
     }).then((data) => {
       res.send({
         code: 200,
         data: data.folderHasPaper
-      });
-    });
-});
+      })
+    })
+})
 
 
 
@@ -116,26 +116,26 @@ router.post('/pushPaper', function (req, res) {
 router.post('/deleteFolder', async function (req, res) {
 
   // 先删除文件夹里面的文章的归属
-  const { folderHasPaper, folderName } = await folderModel.findById(req.body._id, { folderHasPaper: 1, folderName: 1 });
+  const { folderHasPaper, folderName } = await folderModel.findById(req.body._id, { folderHasPaper: 1, folderName: 1 })
 
   folderHasPaper.forEach((item) => {
-    htmlModel.findByIdAndUpdate(item._id, { hasFolder: '' }).exec();
-  });
+    htmlModel.findByIdAndUpdate(item._id, { hasFolder: '' }).exec()
+  })
 
   // 删除图片保留信息
-  imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `文件夹:${folderName} 封面` } } }, { $pullAll: { connection: [`文件夹:${folderName} 封面`] } }).then();
+  imageModel.findOneAndUpdate({ connection: { $elemMatch: { $eq: `文件夹:${folderName} 封面` } } }, { $pullAll: { connection: [`文件夹:${folderName} 封面`] } }).then()
 
 
-  const result = await folderModel.findByIdAndDelete(req.body._id);
+  const result = await folderModel.findByIdAndDelete(req.body._id)
 
-  console.log(result);
+  console.log(result)
 
-  res.send({ code: 200, message: '删除成功！' });
+  res.send({ code: 200, message: '删除成功！' })
 
-});
-
-
+})
 
 
 
-module.exports = router;
+
+
+module.exports = router

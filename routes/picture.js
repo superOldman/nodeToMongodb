@@ -1,45 +1,45 @@
-const express = require('express');
-const router = express.Router();
-const fs = require('fs');
+const express = require('express')
+const router = express.Router()
+const fs = require('fs')
 
-const imageModel = require('../models/imageModel');
-const capacityModel = require('../models/capacityModel');
+const imageModel = require('../models/imageModel')
+const capacityModel = require('../models/capacityModel')
 
 
 
 // utils
-const { beforeIp, delFile } = require('../utils/utils');
+const { beforeIp, delFile } = require('../utils/utils')
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
-});
+  res.send('respond with a resource')
+})
 
 
 
 router.get('/imageList', async function (req, res) {
 
-  let findData = {};
-  let projection = {};
-  let options = { sort: { updated_at: -1 } };
+  let findData = {}
+  let projection = {}
+  let options = { sort: { updated_at: -1 } }
 
-  const { page, pageSize, unclassified } = req.query;
+  const { page, pageSize, unclassified } = req.query
   if (unclassified) {
-    findData.connection = [];
+    findData.connection = []
   }
 
   if (page && pageSize) {
 
-    options.limit = pageSize * 1;
-    options.skip = (page - 1) * pageSize;
+    options.limit = pageSize * 1
+    options.skip = (page - 1) * pageSize
 
 
-    const schema = await imageModel.schema().collection.stats();
-    const list = await imageModel.find(findData, projection, options);
+    const schema = await imageModel.schema().collection.stats()
+    const list = await imageModel.find(findData, projection, options)
     res.send({
       code: 200,
       data: { list, sum: schema.count }
-    });
+    })
   } else {
     imageModel
       .find(findData, projection, options)
@@ -48,8 +48,8 @@ router.get('/imageList', async function (req, res) {
         res.send({
           code: 200,
           data: doc
-        });
-      });
+        })
+      })
   }
 
   // try {
@@ -61,31 +61,31 @@ router.get('/imageList', async function (req, res) {
   //     console.log(error)
   // }
 
-});
+})
 
 router.post('/deleteImage', async function (req, res) {
   try {
-    const result = await imageModel.findByIdAndDelete(req.body._id);
-    console.log(result);
+    const result = await imageModel.findByIdAndDelete(req.body._id)
+    console.log(result)
     if (result) {
-      const path = result.url.split(beforeIp)[1];
-      const { size } = delFile(path);
-      const data = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 });
+      const path = result.url.split(beforeIp)[1]
+      const { size } = delFile(path)
+      const data = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 })
       if(data) {
-        const { pictureDetail } = data;
-        capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count - 1, size: pictureDetail.size - size } }).then();
+        const { pictureDetail } = data
+        capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count - 1, size: pictureDetail.size - size } }).then()
       }
-      res.send({ code: 200, message: '删除成功!' });
+      res.send({ code: 200, message: '删除成功!' })
     }
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 
-});
+})
 
 
 
-module.exports = router;
+module.exports = router
 
 
 

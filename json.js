@@ -216,4 +216,4 @@ json = {
   },
   scaleFactor: 1,
   ok: 1
-};
+}

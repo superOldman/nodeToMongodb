@@ -1,4 +1,4 @@
-const mongoose = require('../db.js');
+const mongoose = require('../db.js')
 
 // 文章列表对象
 class FolderModel {
@@ -26,41 +26,41 @@ class FolderModel {
         type: Date,
         default: Date.now
       }
-    });
+    })
 
-    this.folderModel = mongoose.model('folderList', folderSchema, 'folderList');
+    this.folderModel = mongoose.model('folderList', folderSchema, 'folderList')
   }
   // 填加
   instert(data) {
-    return this.folderModel(data).save();
+    return this.folderModel(data).save()
   }
 
   findOne(data) {
-    return this.folderModel.findOne(data);
+    return this.folderModel.findOne(data)
   }
 
   find(findData, projection, options) {
-    return this.folderModel.find(findData, projection, options);
+    return this.folderModel.find(findData, projection, options)
   }
   findById(findData, projection, options) {
-    return this.folderModel.findById(findData, projection, options);
+    return this.folderModel.findById(findData, projection, options)
   }
   deleteOne(data, callback) {
-    return this.folderModel.deleteOne(data, callback);
+    return this.folderModel.deleteOne(data, callback)
   }
   delete() {
-    return this.folderModel.delete();
+    return this.folderModel.delete()
   }
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.folderModel.findOneAndUpdate(conditions, doc, options);
+    return this.folderModel.findOneAndUpdate(conditions, doc, options)
   }
   findByIdAndUpdate(id, doc, options, callback) {
-    return this.folderModel.findByIdAndUpdate(id, doc, options);
+    return this.folderModel.findByIdAndUpdate(id, doc, options)
   }
   findByIdAndDelete(id, callback) {
-    return this.folderModel.findByIdAndDelete(id, callback);
+    return this.folderModel.findByIdAndDelete(id, callback)
   }
 
 }
 
-module.exports = new FolderModel();
+module.exports = new FolderModel()

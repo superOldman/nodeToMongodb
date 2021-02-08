@@ -1,26 +1,26 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 
-const htmlModel = require('../models/htmlModel');// 引入模型
+const htmlModel = require('../models/htmlModel')// 引入模型
 
 
 router.post('/getTitleList', function (req, res) {
-  const search = {};
+  const search = {}
   if (req.body.length) {
-    search.title = req.body.title;
+    search.title = req.body.title
   }
-  console.log('search');
-  console.log(search);
+  console.log('search')
+  console.log(search)
   htmlModel.find(search).then(function (result, reject) {
 
-    const arr = [];
+    const arr = []
     result.forEach((item) => {
-      arr.push({ value: item.title, id: item._id });
-    });
-    console.log(arr);
-    res.send(arr);
-  });
-});
+      arr.push({ value: item.title, id: item._id })
+    })
+    console.log(arr)
+    res.send(arr)
+  })
+})
 
 
 router.get('/searcByIdpackageTopModel', function (req, res, next) {
@@ -29,7 +29,7 @@ router.get('/searcByIdpackageTopModel', function (req, res, next) {
     // sort('updated_at').
     .exec(function (err, data, count) {
       if (err) {
-        console.log(err);
+        console.log(err)
       } else {
         let list = {
           title: data.title,
@@ -38,13 +38,13 @@ router.get('/searcByIdpackageTopModel', function (req, res, next) {
           upDate: data.updated_at,
           image: data.saveImageUrl,
           show: true
-        };
+        }
         res.send({
           code: 200,
           list
-        });
+        })
       }
-    });
-});
+    })
+})
 
-module.exports = router;
+module.exports = router

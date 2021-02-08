@@ -19,45 +19,41 @@ const formidable = require('formidable')
 // utils
 const { beforeIp, kbOrmb, parseCookie } = require('../utils/utils')
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource')
-})
 
 // 判断登陆
-router.get('/islogin', async function (req, res, next) {
-
+export async function isLogin(req, res, next) {
+  // console.log('islogin head', req.headers['k-token'])
+  // if (req.session.username) {
   const result = await userModel.findOne({ temporaryToken: req.headers['k-token'] }, { password: 0 })
   if (result) {
-    
+
     const len = result.lastLogin.length
     const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2]
-      
-      res.send({
-        code: 200,
-        message: '已经登陆！',
-        username: result.username,
-        userMessage: {
-          title: '管理员',
-          userName: result.username,
-          lastLogin: lastLogin,
-          photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-          motto: result.motto,
-          level: result.level
-        }
-      })
 
+    res.send({
+      code: 200,
+      message: '已经登陆！',
+      username: result.username,
+      userMessage: {
+        title: '管理员',
+        userName: result.username,
+        lastLogin: lastLogin,
+        photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+        motto: result.motto,
+        level: result.level
+      }
+    })
   } else {
     res.send({ code: 403, message: '登录过期' })
   }
-
-})
+}
 
 
 // 登录接口
 router.post('/login', async function (req, res) {
   const username = req.body.username
   const password = req.body.password
+
 
   const result = await userModel.findOneAndUpdate({ username }, { $push: { lastLogin: new Date() } })
 
@@ -73,7 +69,6 @@ router.post('/login', async function (req, res) {
       if (len >= 10) {
         await userModel.findOneAndUpdate({ username }, { $pop: { lastLogin: -1 } })
       }
-
       // 登陆成功，添加token验证
       const _id = result._id.toString()
       // 将用户id传入并生成token

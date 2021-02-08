@@ -1,5 +1,5 @@
-const mongoose = require('../db.js');
-const { options } = require('../routes/index.js');
+const mongoose = require('../db.js')
+const { options } = require('../routes/index.js')
 
 // 容量对象
 class CapacityModel {
@@ -33,44 +33,44 @@ class CapacityModel {
         type: Date,
         default: Date.now
       }
-    });
+    })
 
-    this.capacityModel = mongoose.model('capacityList', capacitySchema, 'capacityList');
+    this.capacityModel = mongoose.model('capacityList', capacitySchema, 'capacityList')
   }
   schema() {
-    return this.capacityModel;
+    return this.capacityModel
   }
   // 填加
   instert(data) {
-    return this.capacityModel(data).save();
+    return this.capacityModel(data).save()
   }
 
   findOne(data, projection, options) {
-    return this.capacityModel.findOne(data, projection, options);
+    return this.capacityModel.findOne(data, projection, options)
   }
 
   find(findData, projection, options) {
-    return this.capacityModel.find(findData, projection, options);
+    return this.capacityModel.find(findData, projection, options)
   }
   findById(findData, projection, options) {
-    return this.capacityModel.findById(findData, projection, options);
+    return this.capacityModel.findById(findData, projection, options)
   }
   deleteOne(data, callback) {
-    return this.capacityModel.deleteOne(data, callback);
+    return this.capacityModel.deleteOne(data, callback)
   }
   delete() {
-    return this.capacityModel.delete();
+    return this.capacityModel.delete()
   }
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.capacityModel.findOneAndUpdate(conditions, doc, options);
+    return this.capacityModel.findOneAndUpdate(conditions, doc, options)
   }
   findByIdAndUpdate(id, doc, options, callback) {
-    return this.capacityModel.findByIdAndUpdate(id, doc, options);
+    return this.capacityModel.findByIdAndUpdate(id, doc, options)
   }
   findByIdAndDelete(id, callback) {
-    return this.capacityModel.findByIdAndDelete(id, callback);
+    return this.capacityModel.findByIdAndDelete(id, callback)
   }
 
 }
 
-module.exports = new CapacityModel();
+module.exports = new CapacityModel()

@@ -1,4 +1,4 @@
-const mongoose = require('../db.js');
+const mongoose = require('../db.js')
 
 class UserModel {
   constructor() {
@@ -42,26 +42,26 @@ class UserModel {
           textSize: 0
         }
       }
-    });
+    })
 
-    this.userModel = mongoose.model('userList', userSchema, 'userList'); // 将该Schema发布为Model,userList就是集合名称
+    this.userModel = mongoose.model('userList', userSchema, 'userList') // 将该Schema发布为Model,userList就是集合名称
   }
 
   // 注册用户
   instert(data) {
-    return this.userModel(data).save();
+    return this.userModel(data).save()
   }
   // 查找
   findOne(data, options) {
-    return this.userModel.findOne(data, options);
+    return this.userModel.findOne(data, options)
   }
 
   findOneAndUpdate(conditions, doc, options, callback) {
-    return this.userModel.findOneAndUpdate(conditions, doc, options);
+    return this.userModel.findOneAndUpdate(conditions, doc, options)
   }
 
   findOneAndDelete(conditions, options) {
-    return this.userModel.findOneAndDelete(conditions, options);
+    return this.userModel.findOneAndDelete(conditions, options)
   }
 
 }
@@ -69,4 +69,4 @@ class UserModel {
 
 
 
-module.exports = new UserModel();
+module.exports = new UserModel()

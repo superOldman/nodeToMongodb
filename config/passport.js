@@ -1,17 +1,17 @@
 
 
-const LocalStrategy = require('passport-local').Strategy;
-const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy
+const passport = require('passport')
 /**
  * Expose
  */
 passport.serializeUser(function(user, done) {
-  done(null, user);
-});
+  done(null, user)
+})
 
 passport.deserializeUser(function(user, done) {
-  done(null, user);
-});
+  done(null, user)
+})
 
 // use these strategies
 passport.use('local', new LocalStrategy(
@@ -21,7 +21,7 @@ passport.use('local', new LocalStrategy(
     passReqToCallback: true
   },
   function (username, password, done) {
-    console.log('passportPage:'+username);
+    console.log('passportPage:'+username)
     // console.log(`Trying to verify user, username:${username} password:${password}`)
     // if (username != 'joe' || password != 'password') {
     //     console.log(`Failed to verify user, username:${username} password:${password}`)
@@ -29,8 +29,8 @@ passport.use('local', new LocalStrategy(
     // }
     // return done(null, { "username": username, "password": password },{message:'Successfully authenticated!'});
   }
-));
-module.exports = passport;
+))
+module.exports = passport
 
 // const LocalStrategy = require('passport-local').Strategy;
 // const bcrypt = require('bcryptjs');

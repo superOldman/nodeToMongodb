@@ -107,4 +107,4 @@ dist
 /public/images
 
 # 秘钥
-/utils/pem/
+/utils/pem

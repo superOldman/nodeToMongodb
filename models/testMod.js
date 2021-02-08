@@ -1,4 +1,4 @@
-const mongoose = require('../db.js');
+const mongoose = require('../db.js')
 
 // 文章列表对象
 class TestModel {
@@ -20,18 +20,18 @@ class TestModel {
         type: Date,
         default: new Date()
       }
-    });
+    })
 
-    this.testModel = mongoose.model('testList', testSchema, 'testList'); // 将该Schema发布为Model,userList就是集合名称
+    this.testModel = mongoose.model('testList', testSchema, 'testList') // 将该Schema发布为Model,userList就是集合名称
   }
 
   getMod(data) {
-    if(data) return this.testModel(data);
+    if(data) return this.testModel(data)
 
-    return this.testModel;
+    return this.testModel
   }
 
 
 }
 
-module.exports = new TestModel();
+module.exports = new TestModel()

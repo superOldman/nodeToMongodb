@@ -1,44 +1,44 @@
 // 数据库
-require('./db');
+require('./db')
 
 // 基础依赖
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+var createError = require('http-errors')
+var express = require('express')
+var path = require('path')
+var cookieParser = require('cookie-parser')
+var logger = require('morgan')
 // 引入jwt token工具
-const JwtUtil = require('./jwt');
+const JwtUtil = require('./jwt')
 
 // 业务模块
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var editorRouter = require('./routes/editor');
-var searchRouter = require('./routes/search');
-var folderRouter = require('./routes/folder');
-var statsHomeRouter = require('./routes/statsHome');
-var pictureRouter = require('./routes/picture');
+var indexRouter = require('./routes/index')
+var usersRouter = require('./routes/users')
+var editorRouter = require('./routes/editor')
+var searchRouter = require('./routes/search')
+var folderRouter = require('./routes/folder')
+var statsHomeRouter = require('./routes/statsHome')
+var pictureRouter = require('./routes/picture')
 
 // 实例化
-var app = express();
+var app = express()
 
 // 设置 视图为 .html 文件
-var ejs = require('ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.engine('html', ejs.__express);
-app.set('view engine', 'html');
+var ejs = require('ejs')
+app.set('views', path.join(__dirname, 'views'))
+app.engine('html', ejs.__express)
+app.set('view engine', 'html')
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(logger('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))
 
 // 设置图片返回路径
 app.get('/public/images/*', function (req, res) {
-  res.sendFile(__dirname + '/' + req.url);
-  console.log('Request for ' + req.url + ' received.');
-});
+  res.sendFile(__dirname + '/' + req.url)
+  console.log('Request for ' + req.url + ' received.')
+})
 // app.get('*', function (req, res) {
 //   res.sendFile( __dirname + "/" + req.url );
 //   console.log("Request for " + req.url + " received.");
@@ -76,7 +76,7 @@ app.all('*', function (req, res, next) {
     'http://localhost:5503',
     'http://127.0.0.1:5503',
     'http://47.96.2.170:80'
-  ];
+  ]
 
 
   // console.log('拦截跨域');
@@ -95,15 +95,15 @@ app.all('*', function (req, res, next) {
   res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept'
-  );
+  )
   // 客户端携带证书方式（带cookie跨域 必须）
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Credentials', 'true')
   // 跨域允许的请求方式
-  res.header('Access-Control-Allow-Methods', 'DELETE,PUT,POST,GET,OPTIONS');
-  if (req.method.toLowerCase() == 'options') res.send(200);
+  res.header('Access-Control-Allow-Methods', 'DELETE,PUT,POST,GET,OPTIONS')
+  if (req.method.toLowerCase() == 'options') res.send(200)
   // 让options尝试请求快速结束
-  else next();
-});
+  else next()
+})
 
 /**
  *  session 拦截
@@ -117,9 +117,9 @@ app.all('*', function (req, res, next) {
     'folder',
     'statsHome',
     'picture'
-  ];
-  let url = req.originalUrl;
-  let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, '').split('/');
+  ]
+  let url = req.originalUrl
+  let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, '').split('/')
   // if (InterFace.includes(interFaceFirst[1]) &&
   //   interFaceFirst[2] !== 'login' &&
   //   interFaceFirst[2] !== 'register' &&
@@ -128,24 +128,17 @@ app.all('*', function (req, res, next) {
   //   !interFaceFirst[2].startsWith('getContent')
   // ) {
   if (InterFace.includes(interFaceFirst[1])) {
-    if (interFaceFirst[2] !== 'login') {
-      let token = req.headers['k-token'];
-
-      console.log('token', req.headers)
-      console.log('token', token)
-      let jwt = new JwtUtil(token);
-      let result = jwt.verifyToken();
+    if (interFaceFirst[2] !== 'login' && interFaceFirst[2] !== 'logout') {
+      const token = req.headers['k-token']
+      const jwt = new JwtUtil(token)
+      const result = jwt.verifyToken()
       // 如果考验通过就next，否则就返回登陆信息不正确
       if (result == 'err') {
-        //     res.status(403).send({
-        //       code: 1,
-        //       message: '请登录！'
-        //     });
-
-        res.send({ code: 403, msg: '登录已过期,请重新登录' });
+        console.log('未通过')
+        res.send({ code: 403, msg: '登录已过期,请重新登录' })
       }
       else {
-        next();
+        next()
       }
     }
     else {
@@ -154,34 +147,34 @@ app.all('*', function (req, res, next) {
   } else {
     next()
   }
-});
+})
 
 // 通用接口
-app.use('/', indexRouter);
+app.use('/v1', indexRouter)
 // 用户（登录）接口
-app.use('/users', usersRouter);
+app.use('/v1/users', usersRouter)
 // 后台编辑器接口
-app.use('/editor', editorRouter);
+app.use('/v1/editor', editorRouter)
 
-app.use('/search', searchRouter);
-app.use('/folder', folderRouter);
-app.use('/statsHome', statsHomeRouter);
-app.use('/picture', pictureRouter);
+app.use('/v1/search', searchRouter)
+app.use('/v1/folder', folderRouter)
+app.use('/v1/statsHome', statsHomeRouter)
+app.use('/v1/picture', pictureRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
-});
+  next(createError(404))
+})
 
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+  res.status(err.status || 500)
+  res.render('error')
+})
 
 // Passport Config
 // const passport = require('passport');
@@ -249,8 +242,8 @@ app.use(function (err, req, res, next) {
 // console.log(myGetTime())
 
 
-let testMod = require('./models/testMod.js');
-const { EWOULDBLOCK } = require('constants');
+let testMod = require('./models/testMod.js')
+const { EWOULDBLOCK } = require('constants')
 
 // console.log(testMod.testModel)
 
@@ -276,4 +269,4 @@ const { EWOULDBLOCK } = require('constants');
 // testMod.getMod().findByIdAndUpdate('5ed4c318f7a4e6b8b0e99082', { $pull: { arr: {id:1} } }, { new: true }).then(data => {
 //   console.log(data)
 // })
-module.exports = app;
+module.exports = app

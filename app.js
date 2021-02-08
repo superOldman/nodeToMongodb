@@ -61,22 +61,22 @@ app.get('/public/images/*', function (req, res) {
 // );
 
 // 跨域配置
-app.all('*', function (req, res, next) {
-  var orginList = [
-    'http://www.sicilymarmot.top',
-    'http://www.sicilymarmot.top:80',
-    'http://www.sicilymarmot.top/dist',
-    'http://www.sicilymarmot.top:80/dist',
-    'http://sicilymarmot.top',
-    'http://sicilymarmot.top:80',
-    'http://sicilymarmot.top/dist',
-    'http://sicilymarmot.top:80/dist',
-    'http://localhost:9000',
-    'http://localhost:4000',
-    'http://localhost:5503',
-    'http://127.0.0.1:5503',
-    'http://47.96.2.170:80'
-  ]
+// app.all('*', function (req, res, next) {
+//   var orginList = [
+//     'http://www.sicilymarmot.top',
+//     'http://www.sicilymarmot.top:80',
+//     'http://www.sicilymarmot.top/dist',
+//     'http://www.sicilymarmot.top:80/dist',
+//     'http://sicilymarmot.top',
+//     'http://sicilymarmot.top:80',
+//     'http://sicilymarmot.top/dist',
+//     'http://sicilymarmot.top:80/dist',
+//     'http://localhost:9000',
+//     'http://localhost:4000',
+//     'http://localhost:5503',
+//     'http://127.0.0.1:5503',
+//     'http://47.96.2.170:80'
+//   ]
 
 
   // console.log('拦截跨域');
@@ -92,18 +92,18 @@ app.all('*', function (req, res, next) {
   // res.header('Access-Control-Allow-Origin', '*');
 
   // 允许的header类型
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  )
-  // 客户端携带证书方式（带cookie跨域 必须）
-  res.header('Access-Control-Allow-Credentials', 'true')
-  // 跨域允许的请求方式
-  res.header('Access-Control-Allow-Methods', 'DELETE,PUT,POST,GET,OPTIONS')
-  if (req.method.toLowerCase() == 'options') res.send(200)
-  // 让options尝试请求快速结束
-  else next()
-})
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept'
+//   )
+//   // 客户端携带证书方式（带cookie跨域 必须）
+//   res.header('Access-Control-Allow-Credentials', 'true')
+//   // 跨域允许的请求方式
+//   res.header('Access-Control-Allow-Methods', 'DELETE,PUT,POST,GET,OPTIONS')
+//   if (req.method.toLowerCase() == 'options') res.send(200)
+//   // 让options尝试请求快速结束
+//   else next()
+// })
 
 /**
  *  session 拦截
@@ -120,15 +120,11 @@ app.all('*', function (req, res, next) {
   ]
   let url = req.originalUrl
   let interFaceFirst = url.replace(/(^\s*)|(\s*$)/g, '').split('/')
-  // if (InterFace.includes(interFaceFirst[1]) &&
-  //   interFaceFirst[2] !== 'login' &&
-  //   interFaceFirst[2] !== 'register' &&
-  //   interFaceFirst[2] !== 'statistical' &&
-  //   interFaceFirst[2] !== 'qqq' &&
-  //   !interFaceFirst[2].startsWith('getContent')
-  // ) {
-  if (InterFace.includes(interFaceFirst[1])) {
-    if (interFaceFirst[2] !== 'login' && interFaceFirst[2] !== 'logout') {
+  // TODO 待优化
+  // console.log(interFaceFirst)
+  // console.log(InterFace.includes(interFaceFirst[2]))
+  if (InterFace.includes(interFaceFirst[2])) {
+    if (interFaceFirst[3] !== 'login' && interFaceFirst[3] !== 'logout') {
       const token = req.headers['k-token']
       const jwt = new JwtUtil(token)
       const result = jwt.verifyToken()

@@ -189,23 +189,38 @@ router.post('/saveEditorHtml', async function (req, res) {
 
 // 上传图片 利用：formidable
 router.post('/uploadImg', function (req, res) {
+
   const form = formidable({
     multiples: true,
     keepExtensions: true,
     uploadDir: './public/images'
   })
 
+  console.log('form', form);
   form.parse(req, async (err, fields, files) => {
     if (err) {
       console.log('err', err)
     }
     if (files) {
       const file = Object.keys(files)[0]
+      // capacityModel 必须预先建好
       const { pictureDetail } = await capacityModel.findOne({ capacity: 1 }, { pictureDetail: 1 })
+      // const capacityResove = await capacityModel.findOneAndUpdate({ capacity: 1 })
+
+      // let pictureDetail = {
+      //   count: 0,
+      //   size: 0
+      // }
+      // console.log('capacityResove',capacityResove)
+      // if (capacityResove) {
+      //   pictureDetail = capacityResove.pictureDetail
+      // }
       const path = backslashReplace(files[file].path)
 
       imageModel.instert({ url: beforeIp + path, size: kbOrmb(files[file].size) }).then()
-      capacityModel.findOneAndUpdate({ capacity: 1 }, { pictureDetail: { count: pictureDetail.count + 1, size: pictureDetail.size + files[file].size } }).then()
+      capacityModel.findOneAndUpdate({ capacity: 1 }, { 
+        pictureDetail: { count: pictureDetail.count + 1, size: pictureDetail.size + files[file].size }
+      }).then()
 
       res.send({
         success: 1, // 0 表示上传失败，1 表示上传成功

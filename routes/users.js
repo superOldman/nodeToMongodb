@@ -29,23 +29,23 @@ router.get('/islogin', async function (req, res, next) {
 
   const result = await userModel.findOne({ temporaryToken: req.headers['k-token'] }, { password: 0 })
   if (result) {
-    
+
     const len = result.lastLogin.length
     const lastLogin = len === 1 ? result.lastLogin[0] : result.lastLogin[len - 2]
-      
-      res.send({
-        code: 200,
-        message: '已经登陆！',
-        username: result.username,
-        userMessage: {
-          title: '管理员',
-          userName: result.username,
-          lastLogin: lastLogin,
-          photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-          motto: result.motto,
-          level: result.level
-        }
-      })
+
+    res.send({
+      code: 200,
+      message: '已经登陆！',
+      username: result.username,
+      userMessage: {
+        title: '管理员',
+        userName: result.username,
+        lastLogin: lastLogin,
+        photo: result.photo || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+        motto: result.motto,
+        level: result.level
+      }
+    })
 
   } else {
     res.send({ code: 403, message: '登录过期' })
@@ -113,7 +113,7 @@ router.post('/register', function (req, res, next) {
         email: req.body.email,
         password: hash
       }).then(function (data) {
-        req.session.name = req.body.username
+        // req.session.name = req.body.username
         res.send({
           code: 200,
           message: '注册成功'
@@ -288,24 +288,23 @@ router.post('/uploadUserMotto', async function (req, res) {
 
 // 注销账号
 router.post('/writeOff', async function (req, res) {
-  if (req.session.username === req.body.username) {
+  // if (req.session.username === req.body.username) {
     const result = await userModel.findOneAndDelete({ username: req.body.username })
 
 
-    req.session.username = null
+    // req.session.username = null
     res.status(401).send({
       code: 200,
       message: '注销成功！',
       result
     })
 
-  } else {
-    res.send({
-      code: 1,
-      message: '出错了！'
-    })
-
-  }
+  // } else {
+  //   res.send({
+  //     code: 1,
+  //     message: '出错了！'
+  //   })
+  // }
 })
 
 

@@ -7,6 +7,8 @@ const tagModel = require('../models/tagModel')
 const topModel = require('../models/topModel')
 const userModel = require('../models/userModel')
 
+const capacityModel = require('../models/capacityModel')
+
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -14,8 +16,14 @@ router.get('/', function (req, res, next) {
 })
 
 
+// 新建统计表
+router.get('/version', async function (req, res) {
+  await capacityModel.findOneAndUpdate({ capacity: 1 }, {
+    pictureDetail: { count: 0, size: 0 },
+    baseDataSize: 0,
+    paperDetail: { count: 0, size: 0 }
+  }, { upsert: true, setDefaultsOnInsert: true })
 
-router.get('/version', function(req, res) {
   res.send({
     code: 200,
     data: {
@@ -23,6 +31,21 @@ router.get('/version', function(req, res) {
     }
   })
 })
+
+// router.get('/version', async function (req, res) {
+//   await capacityModel.findOneAndUpdate({ capacity: 1 }, {
+//     pictureDetail: { count: 0, size: 0 },
+//     baseDataSize: 0,
+//     paperDetail: { count: 0, size: 0 }
+//   }, { upsert: true, setDefaultsOnInsert: true })
+
+//   res.send({
+//     code: 200,
+//     data: {
+//       version: '2021-2-8 11:25'
+//     }
+//   })
+// })
 
 
 // 查寻列表

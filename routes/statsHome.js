@@ -167,7 +167,16 @@ router.get('/resourceStats', async function (req, res) {
   // const result = await capacityModel.schema().countDocuments();
   // const a = await mongoose.connection.collection('paperList').stats();
   // console.log(a);
-  res.send({ data: result || [] })
+  if(result) {
+    res.send({
+      code: 200,
+      data: result
+    })
+  }else{
+
+  }
+  // if()
+
 })
 
 // 统计文章
@@ -216,7 +225,7 @@ router.get('/statistical', async function (req, res) {
 
 
   // 跑新数据 重新存 capacity: 2 等.. 用作对比
-  await capacityModel.findOneAndUpdate({ capacity: 99 }, {
+  await capacityModel.findOneAndUpdate({ capacity: 1 }, {
     pictureDetail,
     baseDataSize: tj,
     paperDetail
@@ -240,14 +249,14 @@ router.get('/getContent', async function (req, res) {
   const result = await htmlModel.find({ author }, { markdown: 1 })
   console.log(result)
   let len = 0
-  result.forEach((e)=>{
+  result.forEach((e) => {
     len += e.markdown.length
   })
   console.log('len', len)
 
   const level = computeLevel(len)
   console.log(level)
-  level.lv +=1
+  level.lv += 1
   await userModel.findOneAndUpdate({ username: author }, { level }, { upsert: true })
 
   res.send(level)

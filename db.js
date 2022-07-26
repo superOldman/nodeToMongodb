@@ -46,20 +46,20 @@ mongoose.connect('mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + '
 // mongoose.connect('mongodb://'+ ip + ':' + port + '/' + database); // 连接数据库
 
 
-console.log('连接数据库：' + 'mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + ':' + port + '/' + database)
+console.log('正在连接数据库：' + 'mongodb://' + mongoUsername + ':' + mongoPasswd + '@' + ip + ':' + port + '/' + database)
 
 
 var db = mongoose.connection
 
 
-db.on('error', function callback() {
+db.on('error', function callback(err) {
   // 监听是否有异常
-  console.log('Connection error')
+  console.log('Connection error', err)
 })
 db.once('open', function callback() {
   // 监听一次打开
   // 在这里创建你的模式和模型
-  console.log('we are connected!')
+  console.log('连接数据库成功！')
 })
 
 module.exports = mongoose

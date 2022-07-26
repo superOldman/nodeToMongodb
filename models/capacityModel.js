@@ -1,5 +1,5 @@
 const mongoose = require('../db.js')
-const { options } = require('../routes/index.js')
+// const { options } = require('../routes/index.js')
 
 // 容量对象
 class CapacityModel {

@@ -78,20 +78,16 @@ app.get('/public/images/*', function (req, res) {
 //     'http://47.96.2.170:80'
 //   ]
 
+// if (orginList.includes(req.headers.origin.toLowerCase())) {
+//   // 设置允许跨域的域名，*代表允许任意域名跨域
+//   res.header('Access-Control-Allow-Origin', req.headers.origin);
+// }
 
-  // console.log('拦截跨域');
-  // console.log(req.headers);
-  // console.log(req);
-  // if (orginList.includes(req.headers.origin.toLowerCase())) {
-  //   // 设置允许跨域的域名，*代表允许任意域名跨域
-  //   res.header('Access-Control-Allow-Origin', req.headers.origin);
-  // }
+// console.log('走')
+// 允许所有跨域
+// res.header('Access-Control-Allow-Origin', '*');
 
-  // console.log('走')
-  // 允许所有跨域
-  // res.header('Access-Control-Allow-Origin', '*');
-
-  // 允许的header类型
+// 允许的header类型
 //   res.header(
 //     'Access-Control-Allow-Headers',
 //     'Origin, X-Requested-With, Content-Type, Accept'
@@ -109,7 +105,7 @@ app.get('/public/images/*', function (req, res) {
  *  session 拦截
  */
 app.all('*', function (req, res, next) {
-
+  
   // 需拦截
   const InterFace = [
     'users',
@@ -124,7 +120,11 @@ app.all('*', function (req, res, next) {
   // console.log(interFaceFirst)
   // console.log(InterFace.includes(interFaceFirst[2]))
   if (InterFace.includes(interFaceFirst[2])) {
-    if (interFaceFirst[3] !== 'login' && interFaceFirst[3] !== 'logout') {
+    // users忽略验证的接口
+    const verifyList = ['login', 'logout', 'register', 'statistical']
+    if (!verifyList.includes(interFaceFirst[3])) {
+
+      
       const token = req.headers['k-token']
       const jwt = new JwtUtil(token)
       const result = jwt.verifyToken()
